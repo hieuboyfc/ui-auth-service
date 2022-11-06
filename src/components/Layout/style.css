@@ -1,0 +1,39 @@
+#components-layout-demo-side .logo {
+  height: 32px;
+  margin: 16px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.site-layout {
+  background: #ffffff;
+  margin: 0 16px;
+  color: white;
+}
+
+.site-layout-background {
+  background: #ffffff;
+  padding: 24px;
+  height: 100%;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.header-title {
+  float: left;
+  color: white;
+  padding: 12px 0 0 20px;
+}
+
+.header-avatar {
+  float: right;
+  padding-right: 16px;
+  line-height: 58px;
+  cursor: pointer;
+}
+
+.content-breadcrumb {
+  margin: 16px 0;
+}
+
+.footer {
+  text-align: center;
+}

@@ -1,0 +1,105 @@
+{
+  "name": "ui-auth-service",
+  "version": "1.9.7",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hieuboyfc/SpringBoot_React_Auth.git"
+  },
+  "private": true,
+  "license": "HieuBoy",
+  "dependencies": {
+    "@ant-design/icons": "4.7.0",
+    "@reduxjs/toolkit": "1.8.6",
+    "@testing-library/jest-dom": "5.16.4",
+    "@testing-library/react": "13.4.0",
+    "@testing-library/user-event": "14.1.1",
+    "@types/helmet": "4.0.0",
+    "@types/jest": "27.4.1",
+    "@types/node": "17.0.25",
+    "@types/react": "18.0.6",
+    "@types/react-dom": "18.0.2",
+    "antd": "4.24.1",
+    "antd-button-color": "1.0.4",
+    "axios": "1.1.3",
+    "connected-react-router": "6.9.3",
+    "history": "5.3.0",
+    "js-cookie": "3.0.1",
+    "qs": "6.11.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-google-login": "5.2.2",
+    "react-helmet-async": "1.3.0",
+    "react-loading": "2.0.3",
+    "react-redux": "8.0.1",
+    "react-responsive": "9.0.0",
+    "react-router-dom": "6.4.2",
+    "react-scripts": "5.0.1",
+    "redux": "4.2.0",
+    "redux-saga": "1.2.1",
+    "typescript": "4.8.4",
+    "web-vitals": "2.1.0"
+  },
+  "scripts": {
+    "start": "set PORT=1234 && react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "prettier": "prettier \"src/**/*.{js,jsx,ts,tsx}\"",
+    "format": "npm run prettier -- --write",
+    "linting": "eslint . --ext .js,.jsx,.ts,.tsx src --color",
+    "linting-fix": "eslint . --ext .js,.jsx,.ts,.tsx --quiet --fix",
+    "lint": "eslint src/* --color",
+    "lint-fix": "eslint src/* --quiet --fix",
+    "pre-commit": "lint-staged"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "7.19.1",
+    "@types/react-helmet": "6.1.5",
+    "@typescript-eslint/eslint-plugin": "5.42.0",
+    "babel-eslint": "10.1.0",
+    "eslint": "8.26.0",
+    "eslint-config-airbnb": "19.0.4",
+    "eslint-config-airbnb-typescript": "17.0.0",
+    "eslint-config-next": "13.0.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-flowtype": "8.0.3",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-jsx-a11y": "6.6.1",
+    "eslint-plugin-prettier": "4.2.1",
+    "eslint-plugin-react": "7.31.10",
+    "eslint-plugin-react-hooks": "4.6.0",
+    "husky": "8.0.1",
+    "lint-staged": "13.0.3",
+    "prettier": "2.7.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx,js,jsx}": [
+      "yarn format",
+      "yarn linting",
+      "git add"
+    ]
+  }
+}

@@ -1,0 +1,96 @@
+.text-center {
+  margin: auto;
+  text-align: center;
+}
+
+.loadding {
+  margin: auto;
+  text-align: center;
+  margin-top: 22px;
+}
+
+.system-login {
+  color: black;
+  font-size: 20px;
+  line-height: 60px;
+  margin-top: 8px;
+}
+
+.ping-logo {
+  width: 630px;
+  height: 360px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin: auto;
+}
+
+.button-connect {
+  background-color: gray;
+  color: whitesmoke;
+  height: 40px;
+  padding: 6.4px 15px;
+  font-size: 16px;
+  border-radius: 5px;
+  border-color: gray;
+}
+
+.button-connect:hover {
+  background-color: #fcaf17;
+  color: black;
+  height: 40px;
+  padding: 6.4px 15px;
+  font-size: 16px;
+  border-radius: 5px;
+  border-color: #fcaf17;
+}
+
+.not-connected-logo {
+  filter: grayscale(1);
+}
+
+.not-connected {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 20px;
+  line-height: 40px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 576px) {
+  .not-connected {
+    font-size: 15px;
+    line-height: 30px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .ping-logo {
+    width: 504px;
+    height: 270px;
+    margin-top: 40px;
+  }
+}
+
+@media (max-width: 900px) {
+  .ping-logo {
+    width: 392px;
+    height: 210px;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ping-logo {
+    width: 224px;
+    height: 120px;
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .ping-logo {
+    width: 224px;
+    height: 120px;
+    margin-top: 20px;
+  }
+}
