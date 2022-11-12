@@ -13,7 +13,7 @@ export default function SignIn() {
   const onFinish = async (values: any) => {
     dispatch(
       authActions.login({
-        username: values.email,
+        username: values.username,
         password: values.password,
       }),
     );
@@ -43,23 +43,19 @@ export default function SignIn() {
       <div className="option-text">hoặc sử dụng tài khoản của bạn</div>
 
       <Form.Item
-        name="email"
+        name="username"
         hasFeedback
-        label="Địa chỉ Email"
+        label="Tài khoản"
         labelCol={{ span: 24 }}
         wrapperCol={{ span: 24 }}
         rules={[
           {
             required: true,
-            message: 'Vui lòng nhập email của bạn.',
-          },
-          {
-            type: 'email',
-            message: 'Địa chỉ email của bạn không hợp lệ.',
+            message: 'Vui lòng nhập tài khoản của bạn.',
           },
         ]}
       >
-        <Input placeholder="Địa chỉ Email" size="large" />
+        <Input placeholder="Tài khoản" size="large" />
       </Form.Item>
 
       <Form.Item

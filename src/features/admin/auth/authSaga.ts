@@ -1,34 +1,67 @@
-import { PayloadAction } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import authApi from 'api/authApi';
 import { push } from 'connected-react-router';
+import Cookies from 'js-cookie';
+import JwtDecode from 'jwt-decode';
+import { Menu } from 'models/menu';
+import { Token } from 'models/token';
 import { call, delay, fork, put, take } from 'redux-saga/effects';
 import { authActions, LoginPayload } from './authSlice';
 
 function* handleLogin(payload: LoginPayload) {
   try {
-    console.log('Login: ', payload);
+    const response = yield call(authApi.login, payload);
     yield delay(2000);
-    yield put(
-      authActions.loginSuccess({
-        id: 1,
-        name: 'HieuBoy',
-      }),
-    );
-    localStorage.setItem('accessToken', 'hieuboyfc');
-    yield put(push('/admin'));
+    const data = { ...response };
+    if (data !== null) {
+      const user: Token = JwtDecode(data.accessToken);
+      Cookies.set('accessToken', data.accessToken, {
+        expires: new Date(user.exp * 1000),
+      });
+      const resp = yield call(authApi.getMenuActionByCurrentUser);
+      if (resp !== null) {
+        const menu: Menu = resp;
+        yield put(authActions.getMenuAccessSuccess(menu));
+      }
+      // yield fork(fetchMenuByCurrentUser);
+      yield put(authActions.loginSuccess(data));
+      yield put(push('/admin'));
+    }
   } catch (error) {
-    yield put(authActions.loginFailed(''));
+    if (error instanceof Error) {
+      yield put(authActions.loginFailed(error.message));
+    }
   }
 }
 
 function* handleLogout() {
   yield delay(500);
-  localStorage.removeItem('accessToken');
+  Cookies.remove('accessToken');
   yield put(push('/admin/login'));
+}
+
+function* fetchMenuByCurrentUser() {
+  try {
+    // const response = authApi.getMenuActionByCurrentUser().then((data) => {
+    //   console.log(data);
+    // });
+    const response = yield call(authApi.getMenuActionByCurrentUser);
+    const data = { ...response };
+    yield delay(2000);
+    if (response !== null) {
+      const menu: Menu = data;
+      yield put(authActions.getMenuAccessSuccess(menu));
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      yield put(authActions.getMenuAccessFailed(error.message));
+    }
+  }
 }
 
 function* watchLoginFlow() {
   while (true) {
-    const isLoggedIn = Boolean(localStorage.getItem('accessToken'));
+    const isLoggedIn = Boolean(Cookies.get('accessToken'));
     if (!isLoggedIn) {
       const action: PayloadAction<LoginPayload> = yield take(authActions.login.type);
       yield fork(handleLogin, action.payload);
@@ -40,4 +73,8 @@ function* watchLoginFlow() {
 
 export default function* authSaga() {
   yield fork(watchLoginFlow);
+  const isLoggedIn = Boolean(Cookies.get('accessToken'));
+  if (isLoggedIn) {
+    yield fork(fetchMenuByCurrentUser);
+  }
 }

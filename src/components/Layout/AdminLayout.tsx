@@ -2,6 +2,8 @@ import { DesktopOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Avatar, Breadcrumb, Dropdown, Layout, Menu, message, Space } from 'antd';
 import Title from 'antd/lib/typography/Title';
+import { useAppDispatch } from 'configs/hooks';
+import { authActions } from 'features/admin/auth/authSlice';
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import './style.css';
@@ -58,28 +60,10 @@ const handleMenuClick: MenuProps['onClick'] = (e) => {
   console.log('click', e);
 };
 
-const avatarItems: MenuProps['items'] = [
-  {
-    label: '1st menu item',
-    key: '1',
-    icon: <UserOutlined />,
-    onClick: handleMenuClick,
-  },
-  {
-    label: '2nd menu item',
-    key: '2',
-    icon: <UserOutlined />,
-  },
-  {
-    label: '3rd menu item',
-    key: '3',
-    icon: <UserOutlined />,
-  },
-];
-
 export function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {}, []);
 
@@ -98,6 +82,30 @@ export function AdminLayout() {
     });
     return menuDefault;
   };
+
+  const handleLogoutClick: MenuProps['onClick'] = () => {
+    dispatch(authActions.logout());
+  };
+
+  const avatarItems: MenuProps['items'] = [
+    {
+      label: '1st menu item',
+      key: '1',
+      icon: <UserOutlined />,
+      onClick: handleMenuClick,
+    },
+    {
+      label: '2nd menu item',
+      key: '2',
+      icon: <UserOutlined />,
+    },
+    {
+      label: 'Đăng xuất',
+      key: '3',
+      icon: <UserOutlined />,
+      onClick: handleLogoutClick,
+    },
+  ];
 
   return (
     <>

@@ -12,3 +12,7 @@ export const SUPPORTED_QUERY = {
   from: [],
   to: [],
 };
+
+export const COOKIE_API_KEY = 18001000;
+export const ACCESS_TOKEN_KEY = 'accessToken';
+export const URL_API = 'http://localhost:8088';
