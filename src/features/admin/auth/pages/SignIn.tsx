@@ -1,12 +1,14 @@
 import { LoginOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Typography } from 'antd';
 import { useAppDispatch } from 'configs/hooks';
+import { useState } from 'react';
 import { authActions } from '../authSlice';
 import SocialNetworks from './SocialNetworks';
 
 const { Title } = Typography;
 
 export default function SignIn() {
+  const [loadings, setLoadings] = useState<boolean[]>([]);
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
 
@@ -20,7 +22,24 @@ export default function SignIn() {
   };
 
   const onFinishFailed = () => {
+    enterLoading(0);
     console.log('Failed:');
+  };
+
+  const enterLoading = (index: number) => {
+    setLoadings((prevLoadings) => {
+      const newLoadings = [...prevLoadings];
+      newLoadings[index] = true;
+      return newLoadings;
+    });
+
+    setTimeout(() => {
+      setLoadings((prevLoadings) => {
+        const newLoadings = [...prevLoadings];
+        newLoadings[index] = false;
+        return newLoadings;
+      });
+    }, 6000);
   };
 
   return (
@@ -86,12 +105,13 @@ export default function SignIn() {
       </Form.Item>
 
       <Button
-        loading={false}
+        loading={loadings[1]}
         htmlType="submit"
         shape="round"
         icon={<LoginOutlined />}
         size="large"
         className="mb-10 ant-btn-pink"
+        onClick={() => enterLoading(1)}
       >
         Đăng nhập
       </Button>

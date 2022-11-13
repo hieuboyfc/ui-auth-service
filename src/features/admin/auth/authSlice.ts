@@ -30,35 +30,32 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    login(initState, action: PayloadAction<LoginPayload>) {
-      const state = { ...initState };
+    login(state: any, action: PayloadAction<LoginPayload>) {
       state.logging = true;
       state.username = action.payload.username;
     },
-    loginSuccess(initState, action: PayloadAction<User>) {
-      const state = { ...initState };
+    loginSuccess(state: any, action: PayloadAction<User>) {
       state.isLoggedIn = true;
       state.logging = false;
       state.currentUser = action.payload;
       state.message = '';
     },
-    loginFailed(initState, action: PayloadAction<string>) {
-      const state = { ...initState };
+    loginFailed(state: any, action: PayloadAction<string>) {
       state.logging = false;
       state.message = action.payload;
     },
-    logout(initState) {
-      const state = { ...initState };
+    logout(state: any) {
       state.isLoggedIn = false;
       state.currentUser = undefined;
       state.message = '';
     },
-    getMenuAccessSuccess(initState, action: PayloadAction<Menu>) {
-      const state = { ...initState };
+    getMenuAccessSuccess(state: any, action: PayloadAction<Menu>) {
+      state.isLoggedIn = true;
       state.currentMenuAction = action.payload;
     },
-    getMenuAccessFailed(initState, action: PayloadAction<string>) {
-      const state = { ...initState };
+    getMenuAccessFailed(state: any, action: PayloadAction<string>) {
+      state.isLoggedIn = false;
+      state.currentMenuAction = undefined;
       state.message = action.payload;
     },
   },

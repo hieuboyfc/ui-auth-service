@@ -46,7 +46,7 @@
     "no-console": 1,
     "no-debugger": 1,
     "no-unused-vars": 1,
-    "no-param-reassign": 1,
+    "no-param-reassign": 0,
     "require-yield": 1,
     "spaced-comment": 1
     // "indent": [2, "tab"],

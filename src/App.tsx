@@ -1,6 +1,7 @@
 import { NotFound, PrivateRoute } from 'components/Common';
 import { AdminLayout } from 'components/Layout';
 import Auth from 'features/admin/auth/pages/Auth';
+import { Group } from 'features/admin/category/group/pages/Group';
 import Connecting from 'features/ping/pages/Connecting';
 import { Route, Routes, useRoutes } from 'react-router-dom';
 
@@ -25,10 +26,9 @@ function App() {
         <Route path="/admin/login" element={<Auth />} />
         <Route element={<PrivateRoute />}>
           <Route element={<AdminLayout />}>
-            <Route path="/admin/dashboard" element={<div>Tổng quan</div>} />
             <Route path="/admin/managerApplication" element={<div>Quản lý ứng dụng</div>} />
             <Route path="/admin/managerMenu" element={<div>Quản lý chức năng</div>} />
-            <Route path="/admin/managerGroup" element={<div>Quản lý nhóm người dùng</div>} />
+            <Route path="/admin/managerGroup" element={<Group />} />
             <Route path="/admin/managerUser" element={<div>Quản lý người dùng</div>} />
             <Route path="/admin/*" element={<NotFound />} />
           </Route>

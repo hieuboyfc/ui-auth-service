@@ -1,6 +1,6 @@
 export interface Menu {
-  content: [];
+  children: [];
   label: string;
-  orderNo: string;
-  to: string;
+  key: string;
+  icon: any;
 }

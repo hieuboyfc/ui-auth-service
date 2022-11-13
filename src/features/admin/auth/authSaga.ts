@@ -1,5 +1,6 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import authApi from 'api/authApi';
+import menuActionApi from 'api/menuActionApi';
 import { push } from 'connected-react-router';
 import Cookies from 'js-cookie';
 import JwtDecode from 'jwt-decode';
@@ -18,12 +19,11 @@ function* handleLogin(payload: LoginPayload) {
       Cookies.set('accessToken', data.accessToken, {
         expires: new Date(user.exp * 1000),
       });
-      const resp = yield call(authApi.getMenuActionByCurrentUser);
+      const resp = yield call(menuActionApi.getMenuActionByCurrentUser);
       if (resp !== null) {
         const menu: Menu = resp;
         yield put(authActions.getMenuAccessSuccess(menu));
       }
-      // yield fork(fetchMenuByCurrentUser);
       yield put(authActions.loginSuccess(data));
       yield put(push('/admin'));
     }
@@ -45,9 +45,8 @@ function* fetchMenuByCurrentUser() {
     // const response = authApi.getMenuActionByCurrentUser().then((data) => {
     //   console.log(data);
     // });
-    const response = yield call(authApi.getMenuActionByCurrentUser);
+    const response = yield call(menuActionApi.getMenuActionByCurrentUser);
     const data = { ...response };
-    yield delay(2000);
     if (response !== null) {
       const menu: Menu = data;
       yield put(authActions.getMenuAccessSuccess(menu));
