@@ -1,6 +1,10 @@
 import { Button, Card, Col, Form, Input, Row, Space } from 'antd';
 import Table, { ColumnsType } from 'antd/lib/table';
 import { useState } from 'react';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { GroupParams } from '../groupModel';
+import { fetchGroup } from '../groupService';
+import { groupSelector } from '../groupSlice';
 
 export interface GroupProps {}
 
@@ -102,8 +106,24 @@ const formItemLayout = {
 };
 
 export function Group(props: GroupProps) {
+  const dispatch = useAppDispatch();
+
+  const { ...groupState } = useAppSelector(groupSelector);
+  console.log('state: ', groupState);
+  const { loading, error } = useAppSelector((state) => state.group);
+  console.log('loading: ', loading);
+  console.log('error: ', error);
+
+  const defaultParams: GroupParams = {
+    page: 0,
+    size: 20,
+    sort: 'id',
+    groupCode: '',
+    name: '',
+    status: 1,
+  };
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [loading, setLoading] = useState(false);
 
   const [form] = Form.useForm();
   const [formLayout, setFormLayout] = useState<LayoutType>('inline');
@@ -112,12 +132,10 @@ export function Group(props: GroupProps) {
     setFormLayout(layout);
   };
 
-  const start = () => {
-    setLoading(true);
+  const start = (index: number) => {
     // ajax request after empty completing
     setTimeout(() => {
       setSelectedRowKeys([]);
-      setLoading(false);
     }, 1000);
   };
 
@@ -133,7 +151,13 @@ export function Group(props: GroupProps) {
   const hasSelected = selectedRowKeys.length > 0;
 
   const onFinish = (values: any) => {
-    console.log('Success:', values);
+    const params: GroupParams = {
+      ...defaultParams,
+      groupCode: values.groupCode,
+      name: values.name,
+    };
+    dispatch(fetchGroup(params));
+    console.log('Success:', params);
   };
 
   const onFinishFailed = (errorInfo: any) => {
@@ -147,13 +171,13 @@ export function Group(props: GroupProps) {
           <Form onFinish={onFinish} onFinishFailed={onFinishFailed}>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label="Điều kiện 1" name="a">
-                  <Input placeholder="input placeholder" />
+                <Form.Item label="Mã nhóm: " name="groupCode">
+                  <Input placeholder="Mã nhóm" />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Điều kiện 2" name="b">
-                  <Input placeholder="input placeholder" />
+                <Form.Item label="Tên nhóm: " name="name">
+                  <Input placeholder="Tên nhóm" />
                 </Form.Item>
               </Col>
             </Row>

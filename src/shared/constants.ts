@@ -15,4 +15,5 @@ export const SUPPORTED_QUERY = {
 
 export const COOKIE_API_KEY = 18001000;
 export const ACCESS_TOKEN_KEY = 'accessToken';
+//export const URL_API = 'https://api-auth-service-hieuboy.herokuapp.com';
 export const URL_API = 'http://localhost:8088';

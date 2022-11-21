@@ -1,6 +1,6 @@
 import { LoginOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Typography } from 'antd';
-import { useAppDispatch } from 'configs/hooks';
+import { useAppDispatch } from 'redux/hooks';
 import { useState } from 'react';
 import { authActions } from '../authSlice';
 import SocialNetworks from './SocialNetworks';

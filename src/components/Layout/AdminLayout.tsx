@@ -1,7 +1,7 @@
 import { UserOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Avatar, Breadcrumb, Dropdown, Layout, Menu, MenuProps, message, Space, Spin } from 'antd';
 import Title from 'antd/lib/typography/Title';
-import { useAppDispatch, useAppSelector } from 'configs/hooks';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { authActions, selectCurrentMenuAction } from 'features/admin/auth/authSlice';
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';

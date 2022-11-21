@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom';
 import { history } from 'utils';
-import { store } from './configs/store';
+import { store } from './redux/store';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 

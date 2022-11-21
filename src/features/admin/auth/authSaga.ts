@@ -7,7 +7,8 @@ import JwtDecode from 'jwt-decode';
 import { Menu } from 'models/menu';
 import { Token } from 'models/token';
 import { call, delay, fork, put, take } from 'redux-saga/effects';
-import { authActions, LoginPayload } from './authSlice';
+import { LoginPayload } from './authModel';
+import { authActions } from './authSlice';
 
 function* handleLogin(payload: LoginPayload) {
   try {
