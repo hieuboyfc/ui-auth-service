@@ -124,7 +124,7 @@ button {
   transition: transform 20ms ease-in;
   cursor: pointer;
   margin: 8px 0;
-  width: 100%;
+  /* width: 100%; */
 }
 
 button:active {

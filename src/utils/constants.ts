@@ -13,6 +13,7 @@ export const SUPPORTED_QUERY = {
   to: [],
 };
 
+export const SIZE_OF_PAGE = 10;
 export const COOKIE_API_KEY = 18001000;
 export const ACCESS_TOKEN_KEY = 'accessToken';
 //export const URL_API = 'https://api-auth-service-hieuboy.herokuapp.com';

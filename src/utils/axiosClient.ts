@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
-import { ACCESS_TOKEN_KEY, COOKIE_API_KEY, URL_API } from 'shared';
+import { ACCESS_TOKEN_KEY, COOKIE_API_KEY, URL_API } from './constants';
 
 // https://stackoverflow.com/questions/69417883/axios-post-request-with-typescript-issue
 

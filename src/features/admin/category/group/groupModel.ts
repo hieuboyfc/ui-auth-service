@@ -1,4 +1,5 @@
-export interface Group {
+export interface GroupModel {
+  key: number;
   id: number;
   groupCode: string;
   appCode: string;
@@ -10,7 +11,7 @@ export interface GroupParams {
   page: number;
   size: number;
   sort: string;
-  groupCode?: string;
-  name?: string;
+  groupCode: string | null;
+  name: string | null;
   status: number;
 }

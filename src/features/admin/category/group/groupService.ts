@@ -7,13 +7,9 @@ export const fetchGroup = createAsyncThunk(
   'group/fetchGroup',
   async (params: GroupParams, thunkAPI) => {
     try {
-      console.log('thunkAPI: ', thunkAPI);
-      console.log('data: ', params);
       const response = await groupApi.fetchGroup(params);
-      console.log(response);
-      return response.data;
+      return response;
     } catch (error: any) {
-      console.log(error);
       return thunkAPI.rejectWithValue(error.message);
     }
   },

@@ -1,5 +1,6 @@
-import { URL_API } from 'shared';
-import axiosClient from '../shared/axiosClient';
+
+import { URL_API } from 'utils';
+import axiosClient from '../utils/axiosClient';
 
 const menuActionApi = {
   getMenuActionByCurrentUser() {

@@ -1,10 +1,11 @@
+import { ConfigProvider } from 'antd';
 import App from 'App';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom';
 import { history } from 'utils';
-import { store } from './redux/store';
 import './index.css';
+import { store } from './redux/store';
 import reportWebVitals from './reportWebVitals';
 
 const container = document.getElementById('root')!;
@@ -14,7 +15,9 @@ root.render(
   // <React.StrictMode></React.StrictMode>,
   <Provider store={store}>
     <HistoryRouter history={history}>
-      <App />
+      <ConfigProvider direction="ltr">
+        <App />
+      </ConfigProvider>
     </HistoryRouter>
   </Provider>,
 );
