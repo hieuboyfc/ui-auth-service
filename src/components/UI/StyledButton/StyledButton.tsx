@@ -3,6 +3,8 @@ import type { SizeType } from 'antd/es/config-provider/SizeContext';
 import propTypes from 'prop-types';
 
 export interface StyledButtonProps {
+  htmlType?: any;
+  form?: any;
   type?: any;
   title?: string;
   icon?: any;
@@ -27,6 +29,8 @@ export default function StyledButton(props: StyledButtonProps) {
 }
 
 StyledButton.defaultProps = {
+  htmlType: [],
+  form: [],
   type: [],
   title: propTypes.string,
   icon: propTypes.element,

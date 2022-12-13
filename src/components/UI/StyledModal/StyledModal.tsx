@@ -12,6 +12,8 @@ export interface StyledModalProps {
   confirmLoading?: boolean;
   className?: string;
   buttonTitle?: string;
+  form?: string;
+  htmlType?: string;
 }
 
 export default function StyledModal(props: StyledModalProps) {
@@ -32,6 +34,8 @@ export default function StyledModal(props: StyledModalProps) {
                 size="middle"
                 icon={<SaveOutlined />}
                 title={result.buttonTitle}
+                form={result.form}
+                htmlType={result.htmlType}
               />
               <StyledButton
                 type
@@ -59,4 +63,6 @@ StyledModal.defaultProps = {
   confirmLoading: propTypes.bool,
   className: propTypes.string,
   buttonTitle: propTypes.string,
+  form: propTypes.string,
+  htmlType: propTypes.string,
 };

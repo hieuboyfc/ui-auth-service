@@ -1,5 +1,6 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Card, Col, Form, Input, Popconfirm, Row, Space, Tag } from 'antd';
+import { Button, Card, Col, Form, Input, Popconfirm, Row, Select, Space, Tag } from 'antd';
+import { Option } from 'antd/lib/mentions';
 import { ColumnsType } from 'antd/lib/table';
 import StyledButton from 'components/UI/StyledButton/StyledButton';
 import StyledModal from 'components/UI/StyledModal/StyledModal';
@@ -9,7 +10,7 @@ import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { SIZE_OF_PAGE } from 'utils';
 import { Sorter } from 'utils/sorter';
 import { GroupModel, GroupParams } from '../groupModel';
-import { fetchGroup } from '../groupService';
+import { createGroup, fetchGroup } from '../groupService';
 import './style.css';
 
 export interface GroupProps {}
@@ -47,11 +48,11 @@ export function Group(props: GroupProps) {
 
   const columns: ColumnsType<GroupModel> = [
     {
+      fixed: 'left',
       title: 'Mã ứng dụng',
       width: 100,
       dataIndex: 'appCode',
       key: 'appCode',
-      fixed: 'left',
       sorter: {
         compare: Sorter.DEFAULT,
         multiple: 3,
@@ -60,11 +61,11 @@ export function Group(props: GroupProps) {
       ellipsis: true,
     },
     {
+      fixed: 'left',
       title: 'Mã nhóm',
       width: 100,
       dataIndex: 'groupCode',
       key: 'groupCode',
-      fixed: 'left',
       sorter: {
         compare: Sorter.DEFAULT,
         multiple: 2,
@@ -77,7 +78,6 @@ export function Group(props: GroupProps) {
       dataIndex: 'name',
       key: 'name',
       width: 150,
-      fixed: 'left',
       sorter: {
         compare: Sorter.DEFAULT,
         multiple: 1,
@@ -89,7 +89,6 @@ export function Group(props: GroupProps) {
       title: 'Trạng thái',
       key: 'status',
       width: 80,
-      fixed: 'left',
       render: ({ status }) => (
         <>
           <div style={{ textAlign: 'center' }}>
@@ -178,7 +177,7 @@ export function Group(props: GroupProps) {
     setRequestParams(params);
   };
 
-  const onFinish = (values: any) => {
+  const onFinishSearch = (values: any) => {
     const params: GroupParams = {
       ...requestParams,
       groupCode: values.groupCode ? values.groupCode : null,
@@ -188,7 +187,28 @@ export function Group(props: GroupProps) {
     setRequestParams(params);
   };
 
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishSearchFailed = (errorInfo: any) => {
+    console.log('Failed:', errorInfo);
+  };
+
+  const onFinishSave = (values: any) => {
+    const payload: GroupModel = {
+      groupCode: values.groupCode ? values.groupCode : null,
+      appCode: values.appCode ? values.appCode : null,
+      name: values.name ? values.name : null,
+      status: values.status === '1' ? 1 : 2,
+    };
+    setConfirmLoading(true);
+    dispatch(createGroup(payload));
+    setTimeout(() => {
+      setOpenModal(false);
+      setConfirmLoading(false);
+      dispatch(fetchGroup(requestParams));
+    }, 2000);
+  };
+
+  const onFinishSaveFailed = (errorInfo: any) => {
+    setConfirmLoading(false);
     console.log('Failed:', errorInfo);
   };
 
@@ -206,25 +226,88 @@ export function Group(props: GroupProps) {
   };
 
   const handleOk = () => {
-    setModalText('The modal will be closed after two seconds');
-    setConfirmLoading(true);
-    setTimeout(() => {
-      setOpenModal(false);
-      setConfirmLoading(false);
-    }, 2000);
+    // setModalText('The modal will be closed after two seconds');
+    // setConfirmLoading(true);
+    // setTimeout(() => {
+    //   setOpenModal(false);
+    //   setConfirmLoading(false);
+    // }, 2000);
   };
 
   const handleCancel = () => {
+    form.resetFields();
     console.log('Clicked cancel button');
     setOpenModal(false);
   };
+
+  const renderForm = () => (
+    <>
+      <Form
+        form={form}
+        layout="vertical"
+        name="group"
+        labelCol={{ span: 23 }}
+        wrapperCol={{ span: 23 }}
+        initialValues={{ remember: true }}
+        onFinish={onFinishSave}
+        onFinishFailed={onFinishSaveFailed}
+        autoComplete="off"
+      >
+        <Row>
+          <Col span={12}>
+            <Form.Item
+              name="appCode"
+              label="Mã ứng dụng"
+              rules={[{ required: true, message: 'Vui lòng chọn mã ứng dụng!' }]}
+            >
+              <Select placeholder="Chọn ứng dụng">
+                <Option value="Auth-Service">Auth-Service</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="groupCode"
+              label="Mã nhóm"
+              rules={[{ required: true, message: 'Vui lòng nhập mã nhóm!' }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={12}>
+            <Form.Item
+              name="name"
+              label="Tên nhóm"
+              rules={[{ required: true, message: 'Vui lòng nhập tên nhóm!' }]}
+            >
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="status"
+              label="Trạng thái"
+              rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
+            >
+              <Select placeholder="Chọn trạng thái">
+                <Option value="1">Đang hoạt động</Option>
+                <Option value="2">Ngừng hoạt động</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+      </Form>
+    </>
+  );
 
   return (
     <>
       {groups && groups.data && (
         <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
           <Card title="Tìm kiếm dữ liệu" size="small">
-            <Form onFinishFailed={onFinishFailed}>
+            <Form onFinishFailed={onFinishSearchFailed}>
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item label="Mã nhóm: " name="groupCode">
@@ -244,7 +327,7 @@ export function Group(props: GroupProps) {
                     <StyledButton
                       type="primary"
                       loading={loading}
-                      onClick={onFinish}
+                      onClick={onFinishSearch}
                       size="middle"
                       icon={<SearchOutlined />}
                       title="Tìm kiếm"
@@ -287,8 +370,10 @@ export function Group(props: GroupProps) {
         onOk={handleOk}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
-        content={modalText}
+        content={renderForm()}
         buttonTitle={modalButtonTitle}
+        form="group"
+        htmlType="submit"
       />
     </>
   );

@@ -1,6 +1,6 @@
 export interface GroupModel {
-  key: number;
-  id: number;
+  key?: number;
+  id?: number;
   groupCode: string;
   appCode: string;
   name: string;
