@@ -8,7 +8,7 @@ const groupApi = {
     const url = URL_API.concat('/v1/group/search');
     return axiosClient.get(url, { params });
   },
-  createGroup(payload: GroupModel): Promise<GroupModel> {
+  insertGroup(payload: GroupModel): Promise<GroupModel> {
     const url = URL_API.concat('/v1/group');
     return axiosClient.post(url, payload);
   },

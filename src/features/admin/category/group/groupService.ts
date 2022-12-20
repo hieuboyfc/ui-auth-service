@@ -15,11 +15,23 @@ export const fetchGroup = createAsyncThunk(
   },
 );
 
-export const createGroup = createAsyncThunk(
-  'group/createGroup',
+export const insertGroup = createAsyncThunk(
+  'group/insertGroup',
   async (payload: GroupModel, thunkAPI) => {
     try {
-      const response = await groupApi.createGroup(payload);
+      const response = await groupApi.insertGroup(payload);
+      return response;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
+
+export const updateGroup = createAsyncThunk(
+  'group/updateGroup',
+  async (payload: GroupModel, thunkAPI) => {
+    try {
+      const response = await groupApi.updateGroup(payload);
       return response;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message);

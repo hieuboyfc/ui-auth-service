@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListResponse } from 'models/common';
 import { SIZE_OF_PAGE } from 'utils';
 import { GroupModel } from './groupModel';
-import { createGroup, fetchGroup, getGroup } from './groupService';
+import { fetchGroup, getGroup, insertGroup, updateGroup } from './groupService';
 
 export interface GroupState {
   loading?: boolean;
@@ -46,14 +46,26 @@ const groupSlice = createSlice({
         state.error = action.payload;
       });
     builder
-      .addCase(createGroup.pending, (state: any) => {
+      .addCase(insertGroup.pending, (state: any) => {
         state.loading = true;
       })
-      .addCase(createGroup.fulfilled, (state: any, action: PayloadAction<GroupModel>) => {
+      .addCase(insertGroup.fulfilled, (state: any, action: PayloadAction<GroupModel>) => {
         state.loading = false;
         state.data = action.payload;
       })
-      .addCase(createGroup.rejected, (state: any, action: PayloadAction<any>) => {
+      .addCase(insertGroup.rejected, (state: any, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+    builder
+      .addCase(updateGroup.pending, (state: any) => {
+        state.loading = true;
+      })
+      .addCase(updateGroup.fulfilled, (state: any, action: PayloadAction<GroupModel>) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(updateGroup.rejected, (state: any, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
       });

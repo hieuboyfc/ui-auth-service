@@ -5,13 +5,12 @@ import { ColumnsType } from 'antd/lib/table';
 import StyledButton from 'components/UI/StyledButton/StyledButton';
 import StyledModal from 'components/UI/StyledModal/StyledModal';
 import StyledTable from 'components/UI/StyledTable/StyledTable';
-import { group } from 'console';
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { SIZE_OF_PAGE } from 'utils';
 import { Sorter } from 'utils/sorter';
 import { GroupModel, GroupParams } from '../groupModel';
-import { createGroup, fetchGroup, getGroup } from '../groupService';
+import { fetchGroup, getGroup, insertGroup, updateGroup } from '../groupService';
 import './style.css';
 
 export interface GroupProps {}
@@ -42,6 +41,7 @@ export function Group(props: GroupProps) {
   const [modalTitle, setModalTitle] = useState<string>('Thêm mới Nhóm người dùng');
   const [modalButtonTitle, setModalButtonTitle] = useState<string>('Lưu');
   const [modalText, setModalText] = useState<string>('Content of the modal');
+  const [typeSubmit, setTypeSubmit] = useState<string>('AddNew');
 
   useEffect(() => {
     dispatch(fetchGroup(requestParams));
@@ -91,7 +91,7 @@ export function Group(props: GroupProps) {
     setRequestParams(params);
   };
 
-  const onFinishSearch = (values: any) => {
+  const onSearch = (values: any) => {
     const params: GroupParams = {
       ...requestParams,
       groupCode: values.groupCode ? values.groupCode : null,
@@ -101,32 +101,45 @@ export function Group(props: GroupProps) {
     setRequestParams(params);
   };
 
-  const onFinishSearchFailed = (errorInfo: any) => {
+  const onSearchFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo);
   };
 
-  const onFinishSave = (values: any) => {
+  const onSubmit = (values: any) => {
     const payload: GroupModel = {
       groupCode: values.groupCode ? values.groupCode : null,
       appCode: values.appCode ? values.appCode : null,
       name: values.name ? values.name : null,
-      status: values.status === '1' ? 1 : 2,
+      status: values.status ? Number(values.status) : 0,
     };
     setConfirmLoading(true);
-    dispatch(createGroup(payload));
-    setTimeout(() => {
-      setOpenModal(false);
-      setConfirmLoading(false);
-      dispatch(fetchGroup(requestParams));
-    }, 2000);
+    if (typeSubmit === 'AddNew') {
+      dispatch(insertGroup(payload));
+      setTimeout(() => {
+        setOpenModal(false);
+        setConfirmLoading(false);
+        dispatch(fetchGroup(requestParams));
+        form.resetFields();
+      }, 2000);
+    }
+    if (typeSubmit === 'Update') {
+      dispatch(updateGroup(payload));
+      setTimeout(() => {
+        setOpenModal(false);
+        setConfirmLoading(false);
+        dispatch(fetchGroup(requestParams));
+        form.resetFields();
+      }, 2000);
+    }
   };
 
-  const onFinishSaveFailed = (errorInfo: any) => {
+  const onSubmitFailed = (errorInfo: any) => {
     setConfirmLoading(false);
     console.log('Failed:', errorInfo);
   };
 
   const showModal = async (type: string, appCode?: string, groupCode?: string) => {
+    setTypeSubmit(type);
     setModalTitle('Thêm mới Nhóm người dùng');
     if (type === 'AddNew') {
       form.resetFields();
@@ -141,8 +154,11 @@ export function Group(props: GroupProps) {
           groupCode,
         };
         const response = await dispatch(getGroup(params));
-        if (response.payload) {
-          form.setFieldsValue(response.payload);
+        const dataResponse: any = response.payload;
+        if (dataResponse) {
+          const { status, ...newData } = dataResponse;
+          const result = { ...newData, status: status ? String(status) : '0' };
+          form.setFieldsValue(result);
           setModalTitle('Cập nhật Nhóm người dùng');
           setModalButtonTitle('Cập nhật');
           setOpenModal(true);
@@ -266,8 +282,8 @@ export function Group(props: GroupProps) {
         labelCol={{ span: 23 }}
         wrapperCol={{ span: 23 }}
         initialValues={{ remember: true }}
-        onFinish={onFinishSave}
-        onFinishFailed={onFinishSaveFailed}
+        onFinish={onSubmit}
+        onFinishFailed={onSubmitFailed}
         autoComplete="off"
       >
         <Row>
@@ -324,7 +340,7 @@ export function Group(props: GroupProps) {
       {groups && groups.data && (
         <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
           <Card title="Tìm kiếm dữ liệu" size="small">
-            <Form onFinishFailed={onFinishSearchFailed}>
+            <Form onFinishFailed={onSearchFailed}>
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item label="Mã nhóm: " name="groupCode">
@@ -344,7 +360,7 @@ export function Group(props: GroupProps) {
                     <StyledButton
                       type="primary"
                       loading={loading}
-                      onClick={onFinishSearch}
+                      onClick={onSearch}
                       size="middle"
                       icon={<SearchOutlined />}
                       title="Tìm kiếm"
