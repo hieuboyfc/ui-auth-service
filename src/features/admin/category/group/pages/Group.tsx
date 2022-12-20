@@ -5,12 +5,13 @@ import { ColumnsType } from 'antd/lib/table';
 import StyledButton from 'components/UI/StyledButton/StyledButton';
 import StyledModal from 'components/UI/StyledModal/StyledModal';
 import StyledTable from 'components/UI/StyledTable/StyledTable';
+import { group } from 'console';
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { SIZE_OF_PAGE } from 'utils';
 import { Sorter } from 'utils/sorter';
 import { GroupModel, GroupParams } from '../groupModel';
-import { createGroup, fetchGroup } from '../groupService';
+import { createGroup, fetchGroup, getGroup } from '../groupService';
 import './style.css';
 
 export interface GroupProps {}
@@ -32,7 +33,7 @@ const defaultParams: GroupParams = {
 
 export function Group(props: GroupProps) {
   const dispatch = useAppDispatch();
-  const { loading, error, groups } = useAppSelector((state) => state.group);
+  const { loading, error, groups, data } = useAppSelector((state) => state.group);
   const [form] = Form.useForm();
   const [formLayout, setFormLayout] = useState<LayoutType>('inline');
   const [requestParams, setRequestParams] = useState<GroupParams>(defaultParams);
@@ -45,93 +46,6 @@ export function Group(props: GroupProps) {
   useEffect(() => {
     dispatch(fetchGroup(requestParams));
   }, []);
-
-  const columns: ColumnsType<GroupModel> = [
-    {
-      fixed: 'left',
-      title: 'Mã ứng dụng',
-      width: 100,
-      dataIndex: 'appCode',
-      key: 'appCode',
-      sorter: {
-        compare: Sorter.DEFAULT,
-        multiple: 3,
-      },
-      sortDirections: ['descend', 'ascend'],
-      ellipsis: true,
-    },
-    {
-      fixed: 'left',
-      title: 'Mã nhóm',
-      width: 100,
-      dataIndex: 'groupCode',
-      key: 'groupCode',
-      sorter: {
-        compare: Sorter.DEFAULT,
-        multiple: 2,
-      },
-      sortDirections: ['descend', 'ascend'],
-      ellipsis: true,
-    },
-    {
-      title: 'Tên nhóm',
-      dataIndex: 'name',
-      key: 'name',
-      width: 150,
-      sorter: {
-        compare: Sorter.DEFAULT,
-        multiple: 1,
-      },
-      sortDirections: ['descend', 'ascend'],
-      ellipsis: true,
-    },
-    {
-      title: 'Trạng thái',
-      key: 'status',
-      width: 80,
-      render: ({ status }) => (
-        <>
-          <div style={{ textAlign: 'center' }}>
-            <Space direction="vertical">
-              {status === 1 && (
-                <Tag color="blue" key={status}>
-                  Đang hoạt động
-                </Tag>
-              )}
-              {status === 2 && (
-                <Tag color="error" key={status}>
-                  Ngừng hoạt động
-                </Tag>
-              )}
-            </Space>
-          </div>
-        </>
-      ),
-    },
-    {
-      title: 'Chức năng',
-      key: 'operation',
-      width: 60,
-      align: 'center',
-      render: ({ key, groupCode, name }) => (
-        <>
-          <Space wrap>
-            <Button {...buttonProps} type="link" onClick={() => showModal('Update')}>
-              <EditOutlined type="form" /> {key}
-            </Button>
-            <Popconfirm
-              title={`Bạn có muốn xóa (${groupCode} - ${name}) này không? `}
-              onConfirm={() => showModal('Update')}
-              okText="Đồng ý"
-              cancelText="Không"
-            >
-              <Button {...buttonProps} type="link" danger icon={<DeleteOutlined type="form" />} />
-            </Popconfirm>
-          </Space>
-        </>
-      ),
-    },
-  ];
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
 
@@ -212,17 +126,29 @@ export function Group(props: GroupProps) {
     console.log('Failed:', errorInfo);
   };
 
-  const showModal = (type: string) => {
+  const showModal = async (type: string, appCode?: string, groupCode?: string) => {
     setModalTitle('Thêm mới Nhóm người dùng');
     if (type === 'AddNew') {
+      form.resetFields();
       setModalTitle('Thêm mới Nhóm người dùng');
       setModalButtonTitle('Lưu');
+      setOpenModal(true);
     }
     if (type === 'Update') {
-      setModalTitle('Cập nhật Nhóm người dùng');
-      setModalButtonTitle('Cập nhật');
+      if (appCode !== undefined && groupCode !== undefined) {
+        const params = {
+          appCode,
+          groupCode,
+        };
+        const response = await dispatch(getGroup(params));
+        if (response.payload) {
+          form.setFieldsValue(response.payload);
+          setModalTitle('Cập nhật Nhóm người dùng');
+          setModalButtonTitle('Cập nhật');
+          setOpenModal(true);
+        }
+      }
     }
-    setOpenModal(true);
   };
 
   const handleOk = () => {
@@ -239,6 +165,97 @@ export function Group(props: GroupProps) {
     console.log('Clicked cancel button');
     setOpenModal(false);
   };
+
+  const columns: ColumnsType<GroupModel> = [
+    {
+      fixed: 'left',
+      title: 'Mã ứng dụng',
+      width: 100,
+      dataIndex: 'appCode',
+      key: 'appCode',
+      sorter: {
+        compare: Sorter.DEFAULT,
+        multiple: 3,
+      },
+      sortDirections: ['descend', 'ascend'],
+      ellipsis: true,
+    },
+    {
+      fixed: 'left',
+      title: 'Mã nhóm',
+      width: 100,
+      dataIndex: 'groupCode',
+      key: 'groupCode',
+      sorter: {
+        compare: Sorter.DEFAULT,
+        multiple: 2,
+      },
+      sortDirections: ['descend', 'ascend'],
+      ellipsis: true,
+    },
+    {
+      title: 'Tên nhóm',
+      dataIndex: 'name',
+      key: 'name',
+      width: 150,
+      sorter: {
+        compare: Sorter.DEFAULT,
+        multiple: 1,
+      },
+      sortDirections: ['descend', 'ascend'],
+      ellipsis: true,
+    },
+    {
+      title: 'Trạng thái',
+      key: 'status',
+      width: 80,
+      render: ({ status }) => (
+        <>
+          <div style={{ textAlign: 'center' }}>
+            <Space direction="vertical">
+              {status === 1 && (
+                <Tag color="blue" key={status}>
+                  Đang hoạt động
+                </Tag>
+              )}
+              {status === 2 && (
+                <Tag color="error" key={status}>
+                  Ngừng hoạt động
+                </Tag>
+              )}
+            </Space>
+          </div>
+        </>
+      ),
+    },
+    {
+      title: 'Chức năng',
+      key: 'operation',
+      width: 60,
+      align: 'center',
+      render: ({ key, appCode, groupCode, name }) => (
+        <>
+          <Space wrap>
+            <Button
+              {...buttonProps}
+              type="link"
+              onClick={() => showModal('Update', appCode, groupCode)}
+            >
+              <EditOutlined type="form" /> {key}
+            </Button>
+            <Popconfirm
+              title={`Bạn có muốn xóa (${groupCode} - ${name}) này không? `}
+              onConfirm={() => showModal('Delete')}
+              okText="Đồng ý"
+              cancelText="Không"
+            >
+              <Button {...buttonProps} type="link" danger icon={<DeleteOutlined type="form" />} />
+            </Popconfirm>
+          </Space>
+        </>
+      ),
+    },
+  ];
 
   const renderForm = () => (
     <>

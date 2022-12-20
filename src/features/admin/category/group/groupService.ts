@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import groupApi from './groupApi';
-import { GroupModel, GroupParams } from './groupModel';
+import { GroupById, GroupModel, GroupParams } from './groupModel';
 
 // ACTION - SERVICE
 export const fetchGroup = createAsyncThunk(
@@ -26,3 +26,12 @@ export const createGroup = createAsyncThunk(
     }
   },
 );
+
+export const getGroup = createAsyncThunk('group/getGroup', async (params: GroupById, thunkAPI) => {
+  try {
+    const response = await groupApi.getGroup(params);
+    return response;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.message);
+  }
+});

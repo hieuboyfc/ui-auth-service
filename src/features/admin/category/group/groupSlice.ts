@@ -2,19 +2,19 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListResponse } from 'models/common';
 import { SIZE_OF_PAGE } from 'utils';
 import { GroupModel } from './groupModel';
-import { createGroup, fetchGroup } from './groupService';
+import { createGroup, fetchGroup, getGroup } from './groupService';
 
 export interface GroupState {
-  loading: boolean;
-  error: string;
-  group: GroupModel[];
-  groups: ListResponse<GroupModel>;
+  loading?: boolean;
+  error?: string;
+  data?: GroupModel[];
+  groups?: ListResponse<GroupModel>;
 }
 
 const initialState: GroupState = {
   loading: false,
   error: '',
-  group: [],
+  data: undefined,
   groups: {
     data: [],
     last: false,
@@ -31,7 +31,7 @@ const groupSlice = createSlice({
   reducers: {},
   extraReducers(builder) {
     builder
-      .addCase(fetchGroup.pending, (state: any, action: any) => {
+      .addCase(fetchGroup.pending, (state: any) => {
         state.loading = true;
       })
       .addCase(
@@ -46,14 +46,26 @@ const groupSlice = createSlice({
         state.error = action.payload;
       });
     builder
-      .addCase(createGroup.pending, (state: any, action: any) => {
+      .addCase(createGroup.pending, (state: any) => {
         state.loading = true;
       })
       .addCase(createGroup.fulfilled, (state: any, action: PayloadAction<GroupModel>) => {
         state.loading = false;
-        state.group = action.payload;
+        state.data = action.payload;
       })
       .addCase(createGroup.rejected, (state: any, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+    builder
+      .addCase(getGroup.pending, (state: any) => {
+        state.loading = true;
+      })
+      .addCase(getGroup.fulfilled, (state: any, action: PayloadAction<GroupModel>) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(getGroup.rejected, (state: any, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
       });

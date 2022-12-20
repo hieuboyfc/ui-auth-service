@@ -1,7 +1,7 @@
 import { ListResponse } from 'models/common';
 import { URL_API } from 'utils';
 import axiosClient from 'utils/axiosClient';
-import { GroupModel, GroupParams } from './groupModel';
+import { GroupModel, GroupParams, GroupById } from './groupModel';
 
 const groupApi = {
   fetchGroup(params: GroupParams): Promise<ListResponse<GroupModel>> {
@@ -15,6 +15,11 @@ const groupApi = {
   updateGroup(payload: GroupModel): Promise<GroupModel> {
     const url = URL_API.concat('/v1/group');
     return axiosClient.put(url, payload);
+  },
+  getGroup(params: GroupById): Promise<GroupModel> {
+    // const url = URL_API.concat(`/v1/group/${id}`);
+    const url = URL_API.concat('/v1/group');
+    return axiosClient.get(url, { params });
   },
 };
 

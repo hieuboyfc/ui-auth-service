@@ -7,6 +7,11 @@ export interface GroupModel {
   status: number;
 }
 
+export interface GroupById {
+  groupCode?: string;
+  appCode?: string;
+}
+
 export interface GroupParams {
   page: number;
   size: number;
