@@ -14,6 +14,7 @@ export interface StyledModalProps {
   buttonTitle?: string;
   form?: string;
   htmlType?: string;
+  width?: string;
 }
 
 export default function StyledModal(props: StyledModalProps) {
@@ -23,7 +24,6 @@ export default function StyledModal(props: StyledModalProps) {
       <Modal
         {...result}
         maskClosable={false}
-        width="1200px"
         footer={
           <>
             <Space wrap>
@@ -65,4 +65,5 @@ StyledModal.defaultProps = {
   buttonTitle: propTypes.string,
   form: propTypes.string,
   htmlType: propTypes.string,
+  width: propTypes.string,
 };

@@ -39,6 +39,18 @@ export const updateGroup = createAsyncThunk(
   },
 );
 
+export const deleteGroup = createAsyncThunk(
+  'group/deleteGroup',
+  async (params: GroupById, thunkAPI) => {
+    try {
+      const response = await groupApi.deleteGroup(params);
+      return response;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
+
 export const getGroup = createAsyncThunk('group/getGroup', async (params: GroupById, thunkAPI) => {
   try {
     const response = await groupApi.getGroup(params);

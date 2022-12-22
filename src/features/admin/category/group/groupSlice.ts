@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListResponse } from 'models/common';
 import { SIZE_OF_PAGE } from 'utils';
 import { GroupModel } from './groupModel';
-import { fetchGroup, getGroup, insertGroup, updateGroup } from './groupService';
+import { deleteGroup, fetchGroup, getGroup, insertGroup, updateGroup } from './groupService';
 
 export interface GroupState {
   loading?: boolean;
@@ -67,11 +67,27 @@ const groupSlice = createSlice({
       })
       .addCase(updateGroup.rejected, (state: any, action: PayloadAction<any>) => {
         state.loading = false;
+        state.sprin = false;
+        state.error = action.payload;
+      });
+    builder
+      .addCase(deleteGroup.pending, (state: any) => {
+        state.loading = true;
+        state.sprin = true;
+      })
+      .addCase(deleteGroup.fulfilled, (state: any, action: PayloadAction<GroupModel>) => {
+        state.loading = false;
+        state.sprin = false;
+        state.data = action.payload;
+      })
+      .addCase(deleteGroup.rejected, (state: any, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.sprin = false;
         state.error = action.payload;
       });
     builder
       .addCase(getGroup.pending, (state: any) => {
-        state.loading = true;
+        state.loading = false;
       })
       .addCase(getGroup.fulfilled, (state: any, action: PayloadAction<GroupModel>) => {
         state.loading = false;

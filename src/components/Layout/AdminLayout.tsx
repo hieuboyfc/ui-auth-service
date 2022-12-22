@@ -1,10 +1,10 @@
-import { UserOutlined, LoadingOutlined } from '@ant-design/icons';
+import { LoadingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Breadcrumb, Dropdown, Layout, Menu, MenuProps, message, Space, Spin } from 'antd';
 import Title from 'antd/lib/typography/Title';
-import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { authActions, selectCurrentMenuAction } from 'features/admin/auth/authSlice';
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import './style.css';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -67,6 +67,21 @@ export function AdminLayout() {
 
   const currentMenuAction = useAppSelector(selectCurrentMenuAction);
 
+  const listMenuActionChildren = (children: any): any => {
+    const menuChildren: any = [];
+    if (children.length > 0) {
+      children.forEach((item: any) => {
+        menuChildren.push({
+          label: item.label,
+          key: item.key,
+          icon: <UserOutlined />,
+          children: item?.children?.length > 0 ? listMenuActionChildren(item.children) : null,
+        });
+      });
+    }
+    return menuChildren;
+  };
+
   const listMenuAction = (): any => {
     const menu: any = currentMenuAction?.children;
     const menuAction = menu !== undefined ? menu[0] : null;
@@ -86,23 +101,30 @@ export function AdminLayout() {
     return [];
   };
 
-  const listMenuActionChildren = (children: any): any => {
-    const menuChildren: any = [];
-    if (children.length > 0) {
-      children.forEach((item: any) => {
-        menuChildren.push({
-          label: item.label,
-          key: item.key,
-          icon: <UserOutlined />,
-          children: item?.children?.length > 0 ? listMenuActionChildren(item.children) : null,
-        });
-      });
-    }
-    return menuChildren;
-  };
-
   const menuItems = [listMenuAction()];
   const items: MenuProps['items'] = [listMenuAction()];
+
+  const findMenuDefault = () => {
+    let menuDefault = '';
+    const path = window.location.pathname;
+    const menuAction = menuItems[0]?.key === undefined ? [] : [menuItems[0]];
+    if (menuAction.length > 0) {
+      menuAction.forEach((item: any) => {
+        const child = item.children;
+        if (child !== undefined) {
+          child.forEach((o: any) => {
+            if (path === o.key) {
+              menuDefault = item.key;
+            }
+          });
+        }
+      });
+    }
+    if (menuDefault !== '') {
+      setMenuActive(menuDefault);
+    }
+    return menuDefault;
+  };
 
   useEffect(() => {
     setMenuActive('/');
@@ -132,28 +154,6 @@ export function AdminLayout() {
       onClick: handleLogoutClick,
     },
   ];
-
-  const findMenuDefault = () => {
-    let menuDefault = '';
-    const path = window.location.pathname;
-    const menuAction = menuItems[0]?.key === undefined ? [] : [menuItems[0]];
-    if (menuAction.length > 0) {
-      menuAction.forEach((item: any) => {
-        const child = item.children;
-        if (child !== undefined) {
-          child.forEach((o: any) => {
-            if (path === o.key) {
-              menuDefault = item.key;
-            }
-          });
-        }
-      });
-    }
-    if (menuDefault !== '') {
-      setMenuActive(menuDefault);
-    }
-    return menuDefault;
-  };
 
   return (
     <>
