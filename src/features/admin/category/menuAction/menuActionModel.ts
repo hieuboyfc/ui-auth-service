@@ -12,6 +12,12 @@ export interface MenuActionModel {
   status?: number;
 }
 
+export interface MenuActionTree {
+  children?: MenuActionTree[] | undefined;
+  key?: string;
+  title?: string;
+}
+
 export interface MenuActionById {
   menuCode?: string;
   appCode?: string;

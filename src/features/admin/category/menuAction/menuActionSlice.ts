@@ -1,13 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListResponse } from 'models/common';
 import { SIZE_OF_PAGE } from 'utils';
-import { MenuActionModel } from './menuActionModel';
+import { MenuActionModel, MenuActionTree } from './menuActionModel';
 import { getMenuActionAllByGroup } from './menuActionService';
 
 export interface MenuActionState {
   loading?: boolean;
   error?: string;
   data?: MenuActionModel[];
+  dataTree?: MenuActionTree[];
   menuActions?: ListResponse<MenuActionModel>;
 }
 
@@ -15,6 +16,7 @@ const initialState: MenuActionState = {
   loading: false,
   error: '',
   data: undefined,
+  dataTree: undefined,
   menuActions: {
     data: [],
     last: false,
@@ -36,9 +38,9 @@ const menuActionSlice = createSlice({
       })
       .addCase(
         getMenuActionAllByGroup.fulfilled,
-        (state: any, action: PayloadAction<MenuActionModel>) => {
+        (state: any, action: PayloadAction<MenuActionTree>) => {
           state.loading = false;
-          state.data = action.payload;
+          state.dataTree = action.payload;
         },
       )
       .addCase(getMenuActionAllByGroup.rejected, (state: any, action: PayloadAction<any>) => {

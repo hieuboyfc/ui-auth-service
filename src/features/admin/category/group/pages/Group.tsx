@@ -1,14 +1,7 @@
-import {
-  DeleteOutlined,
-  EditOutlined,
-  MenuUnfoldOutlined,
-  PlusOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
-import { Button, Card, Col, Form, Input, Popconfirm, Row, Select, Space, Spin, Tag } from 'antd';
+import { DeleteOutlined, EditOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { Button, Card, Form, Popconfirm, Space, Spin, Tag } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import Tree, { DataNode } from 'antd/lib/tree';
-import StyledButton from 'components/UI/StyledButton/StyledButton';
 import StyledModal from 'components/UI/StyledModal/StyledModal';
 import StyledTable from 'components/UI/StyledTable/StyledTable';
 import React, { useEffect, useState } from 'react';
@@ -16,7 +9,10 @@ import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { SIZE_OF_PAGE } from 'utils';
 import { notifyError, notifySuccess } from 'utils/notification';
 import { Sorter } from 'utils/sorter';
-import { GroupModel, GroupParams } from '../groupModel';
+import { getMenuActionAllByGroup } from '../../menuAction/menuActionService';
+import { FormGroupSave } from '../components/FormGroupSave';
+import { FormGroupSearch } from '../components/FormGroupSearch';
+import { GroupById, GroupModel, GroupParams } from '../groupModel';
 import { deleteGroup, fetchGroup, getGroup, insertGroup, updateGroup } from '../groupService';
 import './style.css';
 
@@ -53,9 +49,10 @@ export function Group() {
   const [spin, setSpin] = useState<boolean>(false);
 
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
-  const [checkedKeys, setCheckedKeys] = useState<React.Key[]>(['0-0-0-0']);
-  const [selectedKeys, setSelectedKeys] = useState<React.Key[]>(['0-0-0-0']);
+  const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
+  const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
+  const [treeData, setTreeData] = useState<DataNode[]>([]);
 
   useEffect(() => {
     dispatch(fetchGroup(requestParams));
@@ -167,7 +164,7 @@ export function Group() {
     notifyError(errorInfo);
   };
 
-  const showModal = async (type: string, appCode?: string, groupCode?: string) => {
+  const showModal = async (type: string, values?: GroupById) => {
     setTypeSubmit(type);
     if (type === 'AddNew') {
       form.resetFields();
@@ -176,11 +173,11 @@ export function Group() {
       setOpenModal(true);
     }
     if (type === 'Update') {
-      if (appCode !== undefined && groupCode !== undefined) {
+      if (values?.appCode !== undefined && values?.groupCode !== undefined) {
         setSpin(true);
         const params = {
-          appCode,
-          groupCode,
+          appCode: values.appCode,
+          groupCode: values.groupCode,
         };
         const response = await dispatch(getGroup(params));
         if (response.meta.requestStatus === 'fulfilled') {
@@ -199,11 +196,29 @@ export function Group() {
     }
   };
 
-  const showModalMenuAction = async (type: string, appCode?: string, groupCode?: string) => {
-    setTypeSubmit(type);
-    setModalButtonTitle('Cập nhật');
-    setModalTitle('Phân quyền chức năng');
-    setOpenModalMenu(true);
+  const showModalMenuAction = async (values?: GroupById) => {
+    if (values?.appCode !== undefined && values?.groupCode !== undefined) {
+      const params = {
+        appCode: values.appCode,
+        groupCode: values.groupCode,
+      };
+      setSpin(true);
+      setModalButtonTitle('Cập nhật');
+      setModalTitle('Phân quyền chức năng cho Nhóm người dùng');
+      const response = await dispatch(getMenuActionAllByGroup(params));
+      if (response?.meta?.requestStatus === 'fulfilled') {
+        const result: any = response.payload;
+        setOpenModalMenu(true);
+        setTreeData(result.children);
+        setExpandedKeys(result.items.expanded);
+        setCheckedKeys(result.items.checked);
+        setSpin(false);
+      } else {
+        notifyError('Đã xảy ra lỗi khi thực hiện Phân quyền chức năng cho Nhóm người dùng');
+      }
+    } else {
+      notifyError('Không lấy được thông tin Mã ứng dụng hoặc Mã nhóm người dùng');
+    }
   };
 
   const deleteItem = async (appCode: string, groupCode: string) => {
@@ -310,7 +325,7 @@ export function Group() {
             <Button
               type="link"
               icon={<EditOutlined type="form" />}
-              onClick={() => showModal('Update', appCode, groupCode)}
+              onClick={() => showModal('Update', { appCode, groupCode })}
             />
             <Popconfirm
               title={`Bạn có muốn xóa (${groupCode} - ${name}) này không? `}
@@ -323,7 +338,7 @@ export function Group() {
             <Button
               type="link"
               icon={<MenuUnfoldOutlined type="form" />}
-              onClick={() => showModalMenuAction('getMenuAction', appCode, groupCode)}
+              onClick={() => showModalMenuAction({ appCode, groupCode })}
             />
           </Space>
         </>
@@ -331,178 +346,7 @@ export function Group() {
     },
   ];
 
-  const treeData: DataNode[] = [
-    {
-      title: '0-0',
-      key: '0-0',
-      children: [
-        {
-          title: '0-0-0',
-          key: '0-0-0',
-          children: [
-            { title: '0-0-0-0', key: '0-0-0-0' },
-            { title: '0-0-0-1', key: '0-0-0-1' },
-            { title: '0-0-0-2', key: '0-0-0-2' },
-          ],
-        },
-        {
-          title: '0-0-1',
-          key: '0-0-1',
-          children: [
-            { title: '0-0-1-0', key: '0-0-1-0' },
-            { title: '0-0-1-1', key: '0-0-1-1' },
-            { title: '0-0-1-2', key: '0-0-1-2' },
-          ],
-        },
-        {
-          title: '0-0-2',
-          key: '0-0-2',
-        },
-      ],
-    },
-    {
-      title: '0-1',
-      key: '0-1',
-      children: [
-        { title: '0-1-0-0', key: '0-1-0-0' },
-        { title: '0-1-0-1', key: '0-1-0-1' },
-        { title: '0-1-0-2', key: '0-1-0-2' },
-      ],
-    },
-    {
-      title: '0-2',
-      key: '0-2',
-    },
-  ];
-
-  const renderSearchForm = () => (
-    <>
-      <Form form={formSearch} onFinishFailed={onSearchFailed}>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Mã nhóm: " name="groupCode">
-              <Input placeholder="Mã nhóm" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Tên nhóm: " name="name">
-              <Input placeholder="Tên nhóm" />
-            </Form.Item>
-          </Col>
-        </Row>
-        {/* <Divider orientation="left">Horizontal</Divider> */}
-        <Row gutter={16} style={{ justifyContent: 'flex-end' }}>
-          <Col style={{ width: '160px' }}>
-            <Form.Item>
-              <StyledButton
-                type="primary"
-                loading={loading}
-                onClick={onSearch}
-                size="middle"
-                icon={<SearchOutlined />}
-                title="Tìm kiếm"
-              />
-            </Form.Item>
-          </Col>
-          <Col style={{ width: '160px' }}>
-            <Form.Item>
-              <StyledButton
-                type="primary"
-                onClick={() => showModal('AddNew')}
-                size="middle"
-                icon={<PlusOutlined />}
-                title="Thêm mới"
-              />
-            </Form.Item>
-          </Col>
-          {/* <Col span={3} offset={18}></Col>
-              <Col span={3}></Col> */}
-        </Row>
-      </Form>
-    </>
-  );
-
-  const renderForm = () => (
-    <>
-      <Spin spinning={spin}>
-        <Form
-          form={form}
-          layout="vertical"
-          name="group"
-          labelCol={{ span: 24 }}
-          wrapperCol={{ span: 24 }}
-          initialValues={{ remember: true }}
-          onFinish={onSubmit}
-          onFinishFailed={onSubmitFailed}
-          autoComplete="off"
-        >
-          <Row>
-            <Col span={24}>
-              {/* Mã ứng dụng */}
-              <Form.Item
-                name="appCode"
-                label="Mã ứng dụng"
-                rules={[{ required: true, message: 'Vui lòng chọn mã ứng dụng!' }]}
-              >
-                <Select
-                  placeholder="Chọn ứng dụng"
-                  options={[
-                    {
-                      value: 'Auth-Service',
-                      label: 'Auth-Service',
-                    },
-                  ]}
-                />
-              </Form.Item>
-
-              {/* Mã nhóm */}
-              <Form.Item
-                name="groupCode"
-                label="Mã nhóm"
-                rules={[{ required: true, message: 'Vui lòng nhập mã nhóm!' }]}
-              >
-                <Input />
-              </Form.Item>
-
-              {/* Tên nhóm */}
-              <Form.Item
-                name="name"
-                label="Tên nhóm"
-                rules={[{ required: true, message: 'Vui lòng nhập tên nhóm!' }]}
-              >
-                <Input />
-              </Form.Item>
-
-              {/* Trạng thái */}
-              <Form.Item
-                name="status"
-                label="Trạng thái"
-                rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
-              >
-                <Select
-                  placeholder="Chọn trạng thái"
-                  options={[
-                    {
-                      value: '1',
-                      label: 'Đang hoạt động',
-                    },
-                    {
-                      value: '2',
-                      label: 'Ngừng hoạt động',
-                    },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-      </Spin>
-    </>
-  );
-
   const onExpandMenuAction = (expandedKeysValue: React.Key[]) => {
-    debugger;
-    console.log('onExpand', expandedKeysValue);
     // if not set autoExpandParent to false, if children expanded, parent can not collapse.
     // or, you can remove all expanded children keys.
     setExpandedKeys(expandedKeysValue);
@@ -521,7 +365,7 @@ export function Group() {
     setSelectedKeys(selectedKeysValue);
   };
 
-  const renderMenuActionForm = () => (
+  const renderMenuAction = () => (
     <>
       <Spin spinning={spin}>
         <Tree
@@ -544,7 +388,13 @@ export function Group() {
       {groups && groups.data && (
         <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
           <Card title="Tìm kiếm dữ liệu" size="small">
-            {renderSearchForm()}
+            <FormGroupSearch
+              loading={loading}
+              form={formSearch}
+              onSearch={onSearch}
+              onFinishFailed={onSearchFailed}
+              showModal={() => showModal('AddNew')}
+            />
           </Card>
           <Card title="Danh sách nhóm người dùng" size="small">
             {/* <div className="total-elements">{`Tổng số bản ghi: ${groups.totalElements}`}</div> */}
@@ -566,7 +416,14 @@ export function Group() {
         onOk={handleOk}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
-        content={renderForm()}
+        content={
+          <FormGroupSave
+            spin={spin}
+            form={form}
+            onFinish={onSubmit}
+            onFinishFailed={onSubmitFailed}
+          />
+        }
         buttonTitle={modalButtonTitle}
         form="group"
         htmlType="submit"
@@ -579,7 +436,7 @@ export function Group() {
         onOk={handleOk}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
-        content={renderMenuActionForm()}
+        content={renderMenuAction()}
         buttonTitle={modalButtonTitle}
         form="menuAction"
         htmlType="submit"
