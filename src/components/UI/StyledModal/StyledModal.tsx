@@ -22,7 +22,12 @@ export default function StyledModal(props: StyledModalProps) {
   return (
     <>
       <Modal
-        {...result}
+        title={result.title}
+        open={result.open}
+        onOk={result.onOk}
+        onCancel={result.onCancel}
+        className={result.className}
+        width={result.width}
         maskClosable={false}
         footer={
           <>

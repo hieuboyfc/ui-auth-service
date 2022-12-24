@@ -1,5 +1,5 @@
 export interface ListResponse<H> {
-  data: H[];
+  result: H[];
   last: boolean;
   page: number;
   size: number;

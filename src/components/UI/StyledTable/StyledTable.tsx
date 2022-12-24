@@ -19,7 +19,7 @@ export default function StyledTable(props: StyledTableProps) {
         loading={result.loading}
         rowSelection={result.rowSelection}
         columns={result.columns}
-        dataSource={result.response.data}
+        dataSource={result.response.result}
         size="small"
         pagination={{
           current: result.response.page + 1,

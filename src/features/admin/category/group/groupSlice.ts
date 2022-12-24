@@ -6,17 +6,17 @@ import { deleteGroup, fetchGroup, getGroup, insertGroup, updateGroup } from './g
 
 export interface GroupState {
   loading?: boolean;
-  error?: string;
+  error?: any;
   data?: GroupModel[];
   groups?: ListResponse<GroupModel>;
 }
 
 const initialState: GroupState = {
   loading: false,
-  error: '',
+  error: {},
   data: undefined,
   groups: {
-    data: [],
+    result: [],
     last: false,
     page: 0,
     size: SIZE_OF_PAGE,
@@ -39,11 +39,12 @@ const groupSlice = createSlice({
         (state: any, action: PayloadAction<ListResponse<GroupModel>>) => {
           state.loading = false;
           state.groups = action.payload;
+          state.error.fetchGroup = '';
         },
       )
       .addCase(fetchGroup.rejected, (state: any, action: PayloadAction<any>) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error.fetchGroup = action.payload;
       });
     builder
       .addCase(insertGroup.pending, (state: any) => {
@@ -52,10 +53,11 @@ const groupSlice = createSlice({
       .addCase(insertGroup.fulfilled, (state: any, action: PayloadAction<GroupModel>) => {
         state.loading = false;
         state.data = action.payload;
+        state.error.insertGroup = '';
       })
       .addCase(insertGroup.rejected, (state: any, action: PayloadAction<any>) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error.insertGroup = action.payload;
       });
     builder
       .addCase(updateGroup.pending, (state: any) => {
@@ -64,11 +66,12 @@ const groupSlice = createSlice({
       .addCase(updateGroup.fulfilled, (state: any, action: PayloadAction<GroupModel>) => {
         state.loading = false;
         state.data = action.payload;
+        state.error.updateGroup = '';
       })
       .addCase(updateGroup.rejected, (state: any, action: PayloadAction<any>) => {
         state.loading = false;
         state.sprin = false;
-        state.error = action.payload;
+        state.error.updateGroup = action.payload;
       });
     builder
       .addCase(deleteGroup.pending, (state: any) => {
@@ -79,11 +82,12 @@ const groupSlice = createSlice({
         state.loading = false;
         state.sprin = false;
         state.data = action.payload;
+        state.error.deleteGroup = '';
       })
       .addCase(deleteGroup.rejected, (state: any, action: PayloadAction<any>) => {
         state.loading = false;
         state.sprin = false;
-        state.error = action.payload;
+        state.error.deleteGroup = action.payload;
       });
     builder
       .addCase(getGroup.pending, (state: any) => {
@@ -92,10 +96,11 @@ const groupSlice = createSlice({
       .addCase(getGroup.fulfilled, (state: any, action: PayloadAction<GroupModel>) => {
         state.loading = false;
         state.data = action.payload;
+        state.error.getGroup = '';
       })
       .addCase(getGroup.rejected, (state: any, action: PayloadAction<any>) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error.getGroup = action.payload;
       });
   },
 });

@@ -18,7 +18,7 @@ const initialState: MenuActionState = {
   data: undefined,
   dataTree: undefined,
   menuActions: {
-    data: [],
+    result: [],
     last: false,
     page: 0,
     size: SIZE_OF_PAGE,

@@ -14,10 +14,10 @@ function* handleLogin(payload: LoginPayload) {
   try {
     const response = yield call(authApi.login, payload);
     yield delay(2000);
-    const data = { ...response };
-    if (data !== null) {
-      const user: Token = JwtDecode(data.accessToken);
-      Cookies.set('accessToken', data.accessToken, {
+    const result = { ...response };
+    if (result !== null) {
+      const user: Token = JwtDecode(result.accessToken);
+      Cookies.set('accessToken', result.accessToken, {
         expires: new Date(user.exp * 1000),
       });
       const resp = yield call(menuActionApi.getMenuActionByCurrentUser);
@@ -25,7 +25,7 @@ function* handleLogin(payload: LoginPayload) {
         const menu: Menu = resp;
         yield put(authActions.getMenuAccessSuccess(menu));
       }
-      yield put(authActions.loginSuccess(data));
+      yield put(authActions.loginSuccess(result));
       yield put(push('/admin'));
     }
   } catch (error) {
@@ -47,9 +47,8 @@ function* fetchMenuByCurrentUser() {
     //   console.log(data);
     // });
     const response = yield call(menuActionApi.getMenuActionByCurrentUser);
-    const data = { ...response };
     if (response !== null) {
-      const menu: Menu = data;
+      const menu: Menu = response;
       yield put(authActions.getMenuAccessSuccess(menu));
     }
   } catch (error) {

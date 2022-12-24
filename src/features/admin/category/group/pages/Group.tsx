@@ -189,7 +189,8 @@ export function Group() {
           setModalButtonTitle('Cập nhật');
           setOpenModal(true);
         } else {
-          notifyError(response.payload);
+          const error: any = response.payload;
+          notifyError(error?.message);
         }
         setSpin(false);
       }
@@ -197,6 +198,7 @@ export function Group() {
   };
 
   const showModalMenuAction = async (values?: GroupById) => {
+    setTypeSubmit('');
     if (values?.appCode !== undefined && values?.groupCode !== undefined) {
       const params = {
         appCode: values.appCode,
@@ -214,7 +216,9 @@ export function Group() {
         setCheckedKeys(result.items.checked);
         setSpin(false);
       } else {
-        notifyError('Đã xảy ra lỗi khi thực hiện Phân quyền chức năng cho Nhóm người dùng');
+        const error: any = response.payload;
+        notifyError(error?.message);
+        //notifyError('Đã xảy ra lỗi khi thực hiện Phân quyền chức năng cho Nhóm người dùng');
       }
     } else {
       notifyError('Không lấy được thông tin Mã ứng dụng hoặc Mã nhóm người dùng');
@@ -232,7 +236,8 @@ export function Group() {
         dispatch(fetchGroup(requestParams));
         notifySuccess('Xóa dữ liệu dữ liệu thành công');
       } else {
-        notifyError(response.payload);
+        const error: any = response.payload;
+        notifyError(error?.message);
       }
     }
   };
@@ -247,9 +252,12 @@ export function Group() {
   };
 
   const handleCancel = () => {
-    form.resetFields();
-    setOpenModal(false);
-    setOpenModalMenu(false);
+    if (typeSubmit !== '') {
+      form.resetFields();
+      setOpenModal(false);
+    } else {
+      setOpenModalMenu(false);
+    }
   };
 
   const columns: ColumnsType<GroupModel> = [
@@ -385,7 +393,7 @@ export function Group() {
 
   return (
     <>
-      {groups && groups.data && (
+      {groups && groups.result && (
         <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
           <Card title="Tìm kiếm dữ liệu" size="small">
             <FormGroupSearch

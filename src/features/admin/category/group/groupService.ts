@@ -10,7 +10,7 @@ export const fetchGroup = createAsyncThunk(
       const response = await groupApi.fetchGroup(params);
       return response;
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message);
+      return thunkAPI.rejectWithValue(error.response.data);
     }
   },
 );
@@ -22,7 +22,7 @@ export const insertGroup = createAsyncThunk(
       const response = await groupApi.insertGroup(payload);
       return response;
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message);
+      return thunkAPI.rejectWithValue(error.response.data);
     }
   },
 );
@@ -34,7 +34,7 @@ export const updateGroup = createAsyncThunk(
       const response = await groupApi.updateGroup(payload);
       return response;
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message);
+      return thunkAPI.rejectWithValue(error.response.data);
     }
   },
 );
@@ -46,7 +46,7 @@ export const deleteGroup = createAsyncThunk(
       const response = await groupApi.deleteGroup(params);
       return response;
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message);
+      return thunkAPI.rejectWithValue(error.response.data);
     }
   },
 );
@@ -56,6 +56,6 @@ export const getGroup = createAsyncThunk('group/getGroup', async (params: GroupB
     const response = await groupApi.getGroup(params);
     return response;
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error.message);
+    return thunkAPI.rejectWithValue(error.response.data);
   }
 });
