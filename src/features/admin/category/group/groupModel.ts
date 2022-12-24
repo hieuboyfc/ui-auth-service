@@ -1,6 +1,7 @@
 export interface GroupModel {
-  key?: number;
+  key?: React.Key;
   id?: number;
+  groupCodeOld?: string;
   groupCode: string;
   appCode: string;
   name: string;

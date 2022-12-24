@@ -77,6 +77,7 @@ export function Group() {
 
   const rowSelection = {
     selectedRowKeys,
+    //columnTitle: selectedRowKeys.length > 0 ? <div>XXX</div> : <></>,
     onChange: onSelectChange,
   };
   const hasSelected = selectedRowKeys.length > 0;
@@ -112,12 +113,14 @@ export function Group() {
     setRequestParams(params);
   };
 
-  const onSearchFailed = (errorInfo: any) => {
-    notifyError(errorInfo);
+  const onSearchFailed = (errorInfo?: any) => {
+    notifyError('Có lỗi xảy ra trong quá trình thao tác');
   };
 
-  const onSubmit = async (values: any) => {
+  const onSubmit = async () => {
+    const values = form.getFieldsValue();
     const payload: GroupModel = {
+      groupCodeOld: form?.getFieldValue('groupCodeOld') || '',
       groupCode: values.groupCode ? values.groupCode : null,
       appCode: values.appCode ? values.appCode : null,
       name: values.name ? values.name : null,
@@ -131,13 +134,16 @@ export function Group() {
         setTimeout(() => {
           setOpenModal(false);
           setConfirmLoading(false);
-          setSpin(false);
           dispatch(fetchGroup(requestParams));
           form.resetFields();
           notifySuccess('Thêm mới dữ liệu thành công');
         }, 2000);
       } else {
         notifyError(response.payload);
+        setTimeout(() => {
+          setSpin(false);
+          setConfirmLoading(false);
+        }, 1500);
       }
     }
     if (typeSubmit === 'Update') {
@@ -146,22 +152,25 @@ export function Group() {
         setTimeout(() => {
           setOpenModal(false);
           setConfirmLoading(false);
-          setSpin(false);
           dispatch(fetchGroup(requestParams));
           form.resetFields();
           notifySuccess('Cập nhật dữ liệu thành công');
         }, 2000);
       } else {
         notifyError(response.payload);
+        setTimeout(() => {
+          setSpin(false);
+          setConfirmLoading(false);
+        }, 1500);
       }
     }
   };
 
   const onSubmitMenuAction = async () => {};
 
-  const onSubmitFailed = (errorInfo: any) => {
+  const onSubmitFailed = (errorInfo?: any) => {
     setConfirmLoading(false);
-    notifyError(errorInfo);
+    notifyError('Có lỗi xảy ra trong quá trình thao tác');
   };
 
   const showModal = async (type: string, values?: GroupById) => {
@@ -183,14 +192,17 @@ export function Group() {
         if (response.meta.requestStatus === 'fulfilled') {
           const dataResponse: any = response.payload;
           const { status, ...newData } = dataResponse;
-          const result = { ...newData, status: status ? String(status) : '0' };
+          const result = {
+            ...newData,
+            groupCodeOld: newData.groupCode,
+            status: status ? String(status) : '0',
+          };
           form.setFieldsValue(result);
           setModalTitle('Cập nhật Nhóm người dùng');
           setModalButtonTitle('Cập nhật');
           setOpenModal(true);
         } else {
-          const error: any = response.payload;
-          notifyError(error?.message);
+          notifyError(response.payload);
         }
         setSpin(false);
       }
@@ -214,12 +226,10 @@ export function Group() {
         setTreeData(result.children);
         setExpandedKeys(result.items.expanded);
         setCheckedKeys(result.items.checked);
-        setSpin(false);
       } else {
-        const error: any = response.payload;
-        notifyError(error?.message);
-        //notifyError('Đã xảy ra lỗi khi thực hiện Phân quyền chức năng cho Nhóm người dùng');
+        notifyError(response.payload);
       }
+      setSpin(false);
     } else {
       notifyError('Không lấy được thông tin Mã ứng dụng hoặc Mã nhóm người dùng');
     }
@@ -236,8 +246,7 @@ export function Group() {
         dispatch(fetchGroup(requestParams));
         notifySuccess('Xóa dữ liệu dữ liệu thành công');
       } else {
-        const error: any = response.payload;
-        notifyError(error?.message);
+        notifyError(response.payload);
       }
     }
   };
@@ -262,9 +271,7 @@ export function Group() {
 
   const columns: ColumnsType<GroupModel> = [
     {
-      fixed: 'left',
       title: 'Mã ứng dụng',
-      width: 100,
       dataIndex: 'appCode',
       key: 'appCode',
       sorter: {
@@ -275,9 +282,7 @@ export function Group() {
       ellipsis: true,
     },
     {
-      fixed: 'left',
       title: 'Mã nhóm',
-      width: 100,
       dataIndex: 'groupCode',
       key: 'groupCode',
       sorter: {
@@ -291,7 +296,6 @@ export function Group() {
       title: 'Tên nhóm',
       dataIndex: 'name',
       key: 'name',
-      width: 150,
       sorter: {
         compare: Sorter.DEFAULT,
         multiple: 1,
@@ -302,7 +306,7 @@ export function Group() {
     {
       title: 'Trạng thái',
       key: 'status',
-      width: 80,
+      width: 180,
       render: ({ status }) => (
         <>
           <div style={{ textAlign: 'center' }}>
@@ -325,7 +329,8 @@ export function Group() {
     {
       title: 'Chức năng',
       key: 'operation',
-      width: 60,
+      fixed: 'right',
+      width: 180,
       align: 'center',
       render: ({ appCode, groupCode, name }) => (
         <>

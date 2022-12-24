@@ -14,9 +14,9 @@ export const notifySuccess = (message: any) => {
   });
 };
 
-export const notifyError = (message: any) => {
+export const notifyError = (error: any) => {
   notification.error({
     message: `Thông báo`,
-    description: message,
+    description: error?.message || error,
   });
 };
