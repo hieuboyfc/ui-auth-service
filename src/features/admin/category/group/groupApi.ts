@@ -1,7 +1,7 @@
 import { ListResponse } from 'models/common';
 import { URL_API } from 'utils';
 import axiosClient from 'utils/axiosClient';
-import { GroupById, GroupModel, GroupParams } from './groupModel';
+import { GroupById, GroupMenuActionUpdate, GroupModel, GroupParams } from './groupModel';
 
 const groupApi = {
   fetchGroup(params: GroupParams): Promise<ListResponse<GroupModel>> {
@@ -24,6 +24,10 @@ const groupApi = {
     // const url = URL_API.concat(`/v1/group/${id}`);
     const url = URL_API.concat('/v1/group');
     return axiosClient.get(url, { params });
+  },
+  updateGroupMenuAction(params: GroupMenuActionUpdate): Promise<GroupModel> {
+    const url = URL_API.concat('/v1/group/update-group-menu-action');
+    return axiosClient.put(url, { params });
   },
 };
 

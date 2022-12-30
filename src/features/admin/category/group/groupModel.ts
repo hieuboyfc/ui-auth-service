@@ -1,7 +1,8 @@
+import React from 'react';
+
 export interface GroupModel {
   key?: React.Key;
   id?: number;
-  groupCodeOld?: string;
   groupCode: string;
   appCode: string;
   name: string;
@@ -11,6 +12,12 @@ export interface GroupModel {
 export interface GroupById {
   groupCode?: string;
   appCode?: string;
+}
+
+export interface GroupMenuActionUpdate {
+  appCode?: string;
+  groupCode?: string;
+  listMenuCode?: string[];
 }
 
 export interface GroupParams {

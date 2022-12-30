@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import groupApi from './groupApi';
-import { GroupById, GroupModel, GroupParams } from './groupModel';
+import { GroupById, GroupMenuActionUpdate, GroupModel, GroupParams } from './groupModel';
 
 // ACTION - SERVICE
 export const fetchGroup = createAsyncThunk(
@@ -59,3 +59,15 @@ export const getGroup = createAsyncThunk('group/getGroup', async (params: GroupB
     return thunkAPI.rejectWithValue(error.response.data);
   }
 });
+
+export const updateGroupMenuAction = createAsyncThunk(
+  'group/updateGroupMenuAction',
+  async (payload: GroupMenuActionUpdate, thunkAPI) => {
+    try {
+      const response = await groupApi.updateGroupMenuAction(payload);
+      return response;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  },
+);

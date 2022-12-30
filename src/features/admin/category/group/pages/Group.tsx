@@ -12,8 +12,15 @@ import { Sorter } from 'utils/sorter';
 import { getMenuActionAllByGroup } from '../../menuAction/menuActionService';
 import { FormGroupSave } from '../components/FormGroupSave';
 import { FormGroupSearch } from '../components/FormGroupSearch';
-import { GroupById, GroupModel, GroupParams } from '../groupModel';
-import { deleteGroup, fetchGroup, getGroup, insertGroup, updateGroup } from '../groupService';
+import { GroupById, GroupMenuActionUpdate, GroupModel, GroupParams } from '../groupModel';
+import {
+  deleteGroup,
+  fetchGroup,
+  getGroup,
+  insertGroup,
+  updateGroup,
+  updateGroupMenuAction,
+} from '../groupService';
 import './style.css';
 
 export interface GroupProps {}
@@ -27,7 +34,7 @@ type LayoutType = Parameters<typeof Form>[0]['layout'];
 const defaultParams: GroupParams = {
   page: 0,
   size: SIZE_OF_PAGE,
-  sort: 'id',
+  sort: 'DESC',
   groupCode: null,
   name: null,
   status: 1,
@@ -39,6 +46,7 @@ export function Group() {
   const [form] = Form.useForm();
   const [formSearch] = Form.useForm();
   const [formLayout, setFormLayout] = useState<LayoutType>('inline');
+  const [groupItem, setGroupItem] = useState<GroupById>({});
   const [requestParams, setRequestParams] = useState<GroupParams>(defaultParams);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [openModalMenu, setOpenModalMenu] = useState<boolean>(false);
@@ -120,7 +128,7 @@ export function Group() {
   const onSubmit = async () => {
     const values = form.getFieldsValue();
     const payload: GroupModel = {
-      groupCodeOld: form?.getFieldValue('groupCodeOld') || '',
+      id: form?.getFieldValue('id') || '',
       groupCode: values.groupCode ? values.groupCode : null,
       appCode: values.appCode ? values.appCode : null,
       name: values.name ? values.name : null,
@@ -194,7 +202,7 @@ export function Group() {
           const { status, ...newData } = dataResponse;
           const result = {
             ...newData,
-            groupCodeOld: newData.groupCode,
+            id: newData.id,
             status: status ? String(status) : '0',
           };
           form.setFieldsValue(result);
@@ -216,6 +224,8 @@ export function Group() {
         appCode: values.appCode,
         groupCode: values.groupCode,
       };
+      setConfirmLoading(false);
+      setGroupItem(params);
       setSpin(true);
       setModalButtonTitle('Cập nhật');
       setModalTitle('Phân quyền chức năng cho Nhóm người dùng');
@@ -367,15 +377,28 @@ export function Group() {
   };
 
   const onCheckMenuAction = (checkedKeysValue: any) => {
-    debugger;
-    console.log('onCheck', checkedKeysValue);
     setCheckedKeys(checkedKeysValue);
   };
 
-  const onSelectMenuAction = (selectedKeysValue: React.Key[], info: any) => {
-    debugger;
-    console.log('onSelect', info);
+  const onSelectMenuAction = (selectedKeysValue: React.Key[], info?: any) => {
     setSelectedKeys(selectedKeysValue);
+  };
+
+  const handleUpdateTree = async () => {
+    if (groupItem.appCode !== undefined && groupItem.groupCode !== undefined) {
+      const payloadTree: GroupMenuActionUpdate = {
+        ...groupItem,
+        listMenuCode: checkedKeys.length > 0 ? [checkedKeys.toString()] : [],
+      };
+      setConfirmLoading(true);
+      setSpin(true);
+      const response = await dispatch(updateGroupMenuAction(payloadTree));
+      if (response.meta.requestStatus === 'fulfilled') {
+      } else {
+      }
+    } else {
+      notifyError('Không lấy được thông tin Mã ứng dụng hoặc Mã nhóm người dùng');
+    }
   };
 
   const renderMenuAction = () => (
@@ -446,7 +469,7 @@ export function Group() {
         title={modalTitle}
         className="modalStyle"
         open={openModalMenu}
-        onOk={handleOk}
+        onOk={handleUpdateTree}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
         content={renderMenuAction()}
