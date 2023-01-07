@@ -57,7 +57,7 @@ export function Group() {
   const [spin, setSpin] = useState<boolean>(false);
 
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
-  const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
+  const [checkedKeys, setCheckedKeys] = useState<[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
   const [treeData, setTreeData] = useState<DataNode[]>([]);
@@ -121,7 +121,7 @@ export function Group() {
     setRequestParams(params);
   };
 
-  const onSearchFailed = (errorInfo?: any) => {
+  const onSearchFailed = () => {
     notifyError('Có lỗi xảy ra trong quá trình thao tác');
   };
 
@@ -176,7 +176,7 @@ export function Group() {
 
   const onSubmitMenuAction = async () => {};
 
-  const onSubmitFailed = (errorInfo?: any) => {
+  const onSubmitFailed = () => {
     setConfirmLoading(false);
     notifyError('Có lỗi xảy ra trong quá trình thao tác');
   };
@@ -223,6 +223,7 @@ export function Group() {
       const params = {
         appCode: values.appCode,
         groupCode: values.groupCode,
+        name: values.name,
       };
       setConfirmLoading(false);
       setGroupItem(params);
@@ -361,7 +362,7 @@ export function Group() {
             <Button
               type="link"
               icon={<MenuUnfoldOutlined type="form" />}
-              onClick={() => showModalMenuAction({ appCode, groupCode })}
+              onClick={() => showModalMenuAction({ appCode, groupCode, name })}
             />
           </Space>
         </>
@@ -376,25 +377,36 @@ export function Group() {
     setAutoExpandParent(false);
   };
 
-  const onCheckMenuAction = (checkedKeysValue: any) => {
-    setCheckedKeys(checkedKeysValue);
+  const onSelectMenuAction = (selectedKeysValue: React.Key[], info?: any) => {
+    console.log(info);
+    setSelectedKeys(selectedKeysValue);
   };
 
-  const onSelectMenuAction = (selectedKeysValue: React.Key[], info?: any) => {
-    setSelectedKeys(selectedKeysValue);
+  const onCheckMenuAction = (checkedKeysValue: any) => {
+    setCheckedKeys(checkedKeysValue);
   };
 
   const handleUpdateTree = async () => {
     if (groupItem.appCode !== undefined && groupItem.groupCode !== undefined) {
       const payloadTree: GroupMenuActionUpdate = {
         ...groupItem,
-        listMenuCode: checkedKeys.length > 0 ? [checkedKeys.toString()] : [],
+        listMenuCode: checkedKeys.length > 0 ? checkedKeys : [],
       };
       setConfirmLoading(true);
       setSpin(true);
       const response = await dispatch(updateGroupMenuAction(payloadTree));
       if (response.meta.requestStatus === 'fulfilled') {
+        setTimeout(() => {
+          setOpenModalMenu(false);
+          setConfirmLoading(false);
+          notifySuccess(`Phân quyền chức năng cho Nhóm người dùng (${groupItem.name}) thành công`);
+        }, 2000);
       } else {
+        setTimeout(() => {
+          setSpin(false);
+          setConfirmLoading(false);
+        }, 1500);
+        notifyError(response.payload);
       }
     } else {
       notifyError('Không lấy được thông tin Mã ứng dụng hoặc Mã nhóm người dùng');

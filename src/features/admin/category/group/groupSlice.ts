@@ -8,7 +8,7 @@ import {
   getGroup,
   insertGroup,
   updateGroup,
-  updateGroupMenuAction
+  updateGroupMenuAction,
 } from './groupService';
 
 export interface GroupState {
@@ -113,7 +113,7 @@ const groupSlice = createSlice({
       .addCase(updateGroupMenuAction.pending, (state: any) => {
         state.loading = false;
       })
-      .addCase(updateGroupMenuAction.fulfilled, (state: any, action: PayloadAction<GroupModel>) => {
+      .addCase(updateGroupMenuAction.fulfilled, (state: any, action: PayloadAction<boolean>) => {
         state.loading = false;
         state.data = action.payload;
         state.error.updateGroupMenuAction = '';

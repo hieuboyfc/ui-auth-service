@@ -12,6 +12,7 @@ export interface GroupModel {
 export interface GroupById {
   groupCode?: string;
   appCode?: string;
+  name?: string;
 }
 
 export interface GroupMenuActionUpdate {

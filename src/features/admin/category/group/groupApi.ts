@@ -25,9 +25,9 @@ const groupApi = {
     const url = URL_API.concat('/v1/group');
     return axiosClient.get(url, { params });
   },
-  updateGroupMenuAction(params: GroupMenuActionUpdate): Promise<GroupModel> {
+  updateGroupMenuAction(payload: GroupMenuActionUpdate): Promise<boolean> {
     const url = URL_API.concat('/v1/group/update-group-menu-action');
-    return axiosClient.put(url, { params });
+    return axiosClient.put(url, payload);
   },
 };
 
