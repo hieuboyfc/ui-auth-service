@@ -1,9 +1,35 @@
+import { ListResponse } from 'models/common';
 import { URL_API } from 'utils';
 import axiosClient from 'utils/axiosClient';
 import { GroupById } from '../group/groupModel';
-import { MenuActionTree } from './menuActionModel';
+import {
+  MenuActionById,
+  MenuActionModel,
+  MenuActionParams,
+  MenuActionTree,
+} from './menuActionModel';
 
 const menuActionApi = {
+  fetchMenuAction(params: MenuActionParams): Promise<ListResponse<MenuActionModel>> {
+    const url = URL_API.concat('/v1/menu-action/search');
+    return axiosClient.get(url, { params });
+  },
+  insertMenuAction(payload: MenuActionModel): Promise<MenuActionModel> {
+    const url = URL_API.concat('/v1/menu-action');
+    return axiosClient.post(url, payload);
+  },
+  updateMenuAction(payload: MenuActionModel): Promise<MenuActionModel> {
+    const url = URL_API.concat('/v1/menu-action');
+    return axiosClient.put(url, payload);
+  },
+  deleteMenuAction(params: MenuActionById): Promise<MenuActionModel> {
+    const url = URL_API.concat('/v1/menu-action');
+    return axiosClient.delete(url, { params });
+  },
+  getMenuAction(params: MenuActionById): Promise<MenuActionModel> {
+    const url = URL_API.concat('/v1/menu-action');
+    return axiosClient.get(url, { params });
+  },
   getMenuActionAllByGroup(params: GroupById): Promise<MenuActionTree> {
     const url = URL_API.concat('/v1/menu-action/menu-action-all-by-group');
     return axiosClient.get(url, { params });

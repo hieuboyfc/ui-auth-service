@@ -1,0 +1,15 @@
+.total-elements {
+    display: grid;
+    text-align: right;
+    padding-bottom: 10px;
+    padding-right: 2px;
+    align-content: center;
+    font-weight: 400;
+  }
+  
+  .ant-table-title {
+    text-align: right;
+    align-content: center;
+    font-weight: 400;
+  }
+  

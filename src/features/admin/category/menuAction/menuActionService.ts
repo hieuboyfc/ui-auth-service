@@ -1,6 +1,68 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { GroupById } from '../group/groupModel';
 import menuActionApi from './menuActionApi';
+import { MenuActionById, MenuActionModel, MenuActionParams } from './menuActionModel';
+
+// ACTION - SERVICE
+export const fetchMenuAction = createAsyncThunk(
+  'menuAction/fetchMenuAction',
+  async (params: MenuActionParams, thunkAPI) => {
+    try {
+      const response = await menuActionApi.fetchMenuAction(params);
+      return response;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const insertMenuAction = createAsyncThunk(
+  'menuAction/insertMenuAction',
+  async (payload: MenuActionModel, thunkAPI) => {
+    try {
+      const response = await menuActionApi.insertMenuAction(payload);
+      return response;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const updateMenuAction = createAsyncThunk(
+  'menuAction/updateMenuAction',
+  async (payload: MenuActionModel, thunkAPI) => {
+    try {
+      const response = await menuActionApi.updateMenuAction(payload);
+      return response;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const deleteMenuAction = createAsyncThunk(
+  'menuAction/deleteMenuAction',
+  async (params: MenuActionById, thunkAPI) => {
+    try {
+      const response = await menuActionApi.deleteMenuAction(params);
+      return response;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const getMenuAction = createAsyncThunk(
+  'menuAction/getMenuAction',
+  async (params: MenuActionById, thunkAPI) => {
+    try {
+      const response = await menuActionApi.getMenuAction(params);
+      return response;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  },
+);
 
 const getListMenuCheckedChildren = (children: any): any => {
   const itemsChildren: any = {
