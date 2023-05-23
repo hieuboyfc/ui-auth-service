@@ -1,10 +1,11 @@
 import { DeleteOutlined, EditOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { Button, Card, Form, Popconfirm, Space, Spin, Tag } from 'antd';
+import { Button, Card, Form, Popconfirm, Result, Space, Spin, Tag } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import Tree, { DataNode } from 'antd/lib/tree';
 import StyledModal from 'components/UI/StyledModal/StyledModal';
 import StyledTable from 'components/UI/StyledTable/StyledTable';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { SIZE_OF_PAGE } from 'utils';
 import { notifyError, notifySuccess } from 'utils/notification';
@@ -41,6 +42,10 @@ const defaultParams: GroupParams = {
 };
 
 export function Group() {
+  const navigate = useNavigate();
+  const backHome = () => {
+    navigate(`/admin`);
+  };
   const dispatch = useAppDispatch();
   const { loading, groups } = useAppSelector((state) => state.group);
   const [form] = Form.useForm();
@@ -55,6 +60,7 @@ export function Group() {
   const [modalButtonTitle, setModalButtonTitle] = useState<string>('Lưu');
   const [typeSubmit, setTypeSubmit] = useState<string>('AddNew');
   const [spin, setSpin] = useState<boolean>(false);
+  const [permission, setPermission] = useState<boolean>(true);
 
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<[]>([]);
@@ -62,8 +68,21 @@ export function Group() {
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
   const [treeData, setTreeData] = useState<DataNode[]>([]);
 
+  function fetchDataGroup(params: GroupParams) {
+    dispatch(fetchGroup(params))
+      .then((result) => {
+        const data: any = { ...result };
+        if (data.meta.requestStatus === 'rejected') {
+          notifyError(data.payload.message);
+        }
+      })
+      .catch((e) => {
+        notifyError(e);
+      });
+  }
+
   useEffect(() => {
-    dispatch(fetchGroup(requestParams));
+    fetchDataGroup(requestParams);
   }, []);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
@@ -96,7 +115,7 @@ export function Group() {
       page: page - 1,
       size: pageSize,
     };
-    dispatch(fetchGroup(params));
+    fetchDataGroup(params);
     setRequestParams(params);
   };
 
@@ -106,7 +125,7 @@ export function Group() {
       page: current - 1,
       size: pageSize,
     };
-    dispatch(fetchGroup(params));
+    fetchDataGroup(params);
     setRequestParams(params);
   };
 
@@ -117,7 +136,7 @@ export function Group() {
       groupCode: values.groupCode ? values.groupCode : null,
       name: values.name ? values.name : null,
     };
-    dispatch(fetchGroup(params));
+    fetchDataGroup(params);
     setRequestParams(params);
   };
 
@@ -433,63 +452,81 @@ export function Group() {
 
   return (
     <>
-      {groups && groups.result && (
-        <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-          <Card title="Tìm kiếm dữ liệu" size="small">
-            <FormGroupSearch
-              loading={loading}
-              form={formSearch}
-              onSearch={onSearch}
-              onFinishFailed={onSearchFailed}
-              showModal={() => showModal('AddNew')}
-            />
-          </Card>
-          <Card title="Danh sách nhóm người dùng" size="small">
-            {/* <div className="total-elements">{`Tổng số bản ghi: ${groups.totalElements}`}</div> */}
-            <StyledTable
-              loading={loading}
-              rowSelection={rowSelection}
-              columns={columns}
-              response={groups}
-              onPageChange={onPageChange}
-              onSizeChange={onSizeChange}
-            />
-          </Card>
-        </Space>
-      )}
-      <StyledModal
-        title={modalTitle}
-        className="modalStyle"
-        open={openModal}
-        onOk={handleOk}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-        content={
-          <FormGroupSave
-            spin={spin}
-            form={form}
-            onFinish={onSubmit}
-            onFinishFailed={onSubmitFailed}
+      {!permission && (
+        <>
+          <Result
+            status="403"
+            title="403"
+            subTitle="Xin lỗi, bạn không được phép truy cập trang này."
+            extra={
+              <Button type="primary" onClick={backHome}>
+                Trang chủ
+              </Button>
+            }
           />
-        }
-        buttonTitle={modalButtonTitle}
-        form="group"
-        htmlType="submit"
-        width="600px"
-      />
-      <StyledModal
-        title={modalTitle}
-        className="modalStyle"
-        open={openModalMenu}
-        onOk={handleUpdateTree}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-        content={renderMenuAction()}
-        buttonTitle={modalButtonTitle}
-        form="menuAction"
-        htmlType="submit"
-        width="800px"
-      />
+        </>
+      )}
+      {permission && (
+        <>
+          {groups && groups.result && (
+            <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
+              <Card title="Tìm kiếm dữ liệu" size="small">
+                <FormGroupSearch
+                  loading={loading}
+                  form={formSearch}
+                  onSearch={onSearch}
+                  onFinishFailed={onSearchFailed}
+                  showModal={() => showModal('AddNew')}
+                />
+              </Card>
+              <Card title="Danh sách nhóm người dùng" size="small">
+                {/* <div className="total-elements">{`Tổng số bản ghi: ${groups.totalElements}`}</div> */}
+                <StyledTable
+                  loading={loading}
+                  rowSelection={rowSelection}
+                  columns={columns}
+                  response={groups}
+                  onPageChange={onPageChange}
+                  onSizeChange={onSizeChange}
+                />
+              </Card>
+            </Space>
+          )}
+          <StyledModal
+            title={modalTitle}
+            className="modalStyle"
+            open={openModal}
+            onOk={handleOk}
+            confirmLoading={confirmLoading}
+            onCancel={handleCancel}
+            content={
+              <FormGroupSave
+                spin={spin}
+                form={form}
+                onFinish={onSubmit}
+                onFinishFailed={onSubmitFailed}
+              />
+            }
+            buttonTitle={modalButtonTitle}
+            form="group"
+            htmlType="submit"
+            width="600px"
+          />
+          <StyledModal
+            title={modalTitle}
+            className="modalStyle"
+            open={openModalMenu}
+            onOk={handleUpdateTree}
+            confirmLoading={confirmLoading}
+            onCancel={handleCancel}
+            content={renderMenuAction()}
+            buttonTitle={modalButtonTitle}
+            form="menuAction"
+            htmlType="submit"
+            width="800px"
+          />
+        </>
+      )}
     </>
   );
 }

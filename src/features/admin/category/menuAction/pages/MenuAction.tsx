@@ -1,9 +1,10 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Card, Form, Popconfirm, Space, Tag } from 'antd';
+import { Button, Card, Form, Popconfirm, Result, Space, Tag } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import StyledModal from 'components/UI/StyledModal/StyledModal';
 import StyledTable from 'components/UI/StyledTable/StyledTable';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { SIZE_OF_PAGE } from 'utils';
 import { notifyError, notifySuccess } from 'utils/notification';
@@ -32,8 +33,12 @@ const defaultParams: MenuActionParams = {
 };
 
 export function MenuAction() {
+  const navigate = useNavigate();
+  const backHome = () => {
+    navigate('/admin', { replace: true });
+  };
   const dispatch = useAppDispatch();
-  const { loading, error, menuActions } = useAppSelector((state) => state.menuAction);
+  const { loading, menuActions } = useAppSelector((state) => state.menuAction);
   const [form] = Form.useForm();
   const [formSearch] = Form.useForm();
   const [requestParams, setRequestParams] = useState<MenuActionParams>(defaultParams);
@@ -43,6 +48,7 @@ export function MenuAction() {
   const [modalButtonTitle, setModalButtonTitle] = useState<string>('Lưu');
   const [typeSubmit, setTypeSubmit] = useState<string>('AddNew');
   const [spin, setSpin] = useState<boolean>(false);
+  const [permission, setPermission] = useState<boolean>(true);
 
   function fetchDataMenuAction(params: MenuActionParams) {
     dispatch(fetchMenuAction(params))
@@ -318,50 +324,68 @@ export function MenuAction() {
 
   return (
     <>
-      {menuActions && menuActions.result && (
-        <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-          <Card title="Tìm kiếm dữ liệu" size="small">
-            <FormMenuActionSearch
-              loading={loading}
-              form={formSearch}
-              onSearch={onSearch}
-              onFinishFailed={onSearchFailed}
-              showModal={() => showModal('AddNew')}
-            />
-          </Card>
-          <Card title="Danh sách chức năng" size="small">
-            {/* <div className="total-elements">{`Tổng số bản ghi: ${menuActions.totalElements}`}</div> */}
-            <StyledTable
-              loading={loading}
-              rowSelection={rowSelection}
-              columns={columns}
-              response={menuActions}
-              onPageChange={onPageChange}
-              onSizeChange={onSizeChange}
-            />
-          </Card>
-        </Space>
-      )}
-      <StyledModal
-        title={modalTitle}
-        className="modalStyle"
-        open={openModal}
-        onOk={handleOk}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-        content={
-          <FormMenuActionSave
-            spin={spin}
-            form={form}
-            onFinish={onSubmit}
-            onFinishFailed={onSubmitFailed}
+      {!permission && (
+        <>
+          <Result
+            status="403"
+            title="403"
+            subTitle="Xin lỗi, bạn không được phép truy cập trang này."
+            extra={
+              <Button type="primary" onClick={backHome}>
+                Trang chủ
+              </Button>
+            }
           />
-        }
-        buttonTitle={modalButtonTitle}
-        form="menuAction"
-        htmlType="submit"
-        width="600px"
-      />
+        </>
+      )}
+      {permission && (
+        <>
+          {menuActions && menuActions.result && (
+            <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
+              <Card title="Tìm kiếm dữ liệu" size="small">
+                <FormMenuActionSearch
+                  loading={loading}
+                  form={formSearch}
+                  onSearch={onSearch}
+                  onFinishFailed={onSearchFailed}
+                  showModal={() => showModal('AddNew')}
+                />
+              </Card>
+              <Card title="Danh sách chức năng" size="small">
+                {/* <div className="total-elements">{`Tổng số bản ghi: ${menuActions.totalElements}`}</div> */}
+                <StyledTable
+                  loading={loading}
+                  rowSelection={rowSelection}
+                  columns={columns}
+                  response={menuActions}
+                  onPageChange={onPageChange}
+                  onSizeChange={onSizeChange}
+                />
+              </Card>
+            </Space>
+          )}
+          <StyledModal
+            title={modalTitle}
+            className="modalStyle"
+            open={openModal}
+            onOk={handleOk}
+            confirmLoading={confirmLoading}
+            onCancel={handleCancel}
+            content={
+              <FormMenuActionSave
+                spin={spin}
+                form={form}
+                onFinish={onSubmit}
+                onFinishFailed={onSubmitFailed}
+              />
+            }
+            buttonTitle={modalButtonTitle}
+            form="menuAction"
+            htmlType="submit"
+            width="600px"
+          />
+        </>
+      )}
     </>
   );
 }
