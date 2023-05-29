@@ -1,6 +1,6 @@
 import { LoginPayload } from 'features/admin/auth/authModel';
 import { URL_API } from 'utils';
-import axiosClient from '../utils/axiosClient';
+import axiosClient from '../../../utils/axiosClient';
 
 const authApi = {
   login(data: LoginPayload) {

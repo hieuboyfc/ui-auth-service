@@ -39,6 +39,7 @@ export function MenuAction() {
   };
   const dispatch = useAppDispatch();
   const { loading, menuActions } = useAppSelector((state) => state.menuAction);
+  const { currentMenuActionAll } = useAppSelector((state) => state.auth);
   const [form] = Form.useForm();
   const [formSearch] = Form.useForm();
   const [requestParams, setRequestParams] = useState<MenuActionParams>(defaultParams);
@@ -49,6 +50,26 @@ export function MenuAction() {
   const [typeSubmit, setTypeSubmit] = useState<string>('AddNew');
   const [spin, setSpin] = useState<boolean>(false);
   const [permission, setPermission] = useState<boolean>(true);
+  const [dataPermission, setDataPermission] = useState<any>();
+
+  useEffect(() => {
+    if (currentMenuActionAll !== undefined) {
+      setDataPermission(currentMenuActionAll);
+    }
+  }, [currentMenuActionAll]);
+
+  function checkPermission(menuCode: string) {
+    let check = false;
+    if (dataPermission !== undefined) {
+      check = dataPermission.filter((item: string) => {
+        if (item === menuCode) {
+          return true;
+        }
+        return false;
+      });
+    }
+    return check;
+  }
 
   function fetchDataMenuAction(params: MenuActionParams) {
     dispatch(fetchMenuAction(params))
@@ -303,19 +324,28 @@ export function MenuAction() {
       render: ({ appCode, menuCode, name }) => (
         <>
           <Space wrap>
-            <Button
-              type="link"
-              icon={<EditOutlined type="form" />}
-              onClick={() => showModal('Update', { appCode, menuCode })}
-            />
-            <Popconfirm
-              title={`Bạn có muốn xóa (${menuCode} - ${name}) này không? `}
-              onConfirm={() => deleteItem(appCode, menuCode)}
-              okText="Đồng ý"
-              cancelText="Không"
-            >
-              <Button type="link" danger icon={<DeleteOutlined type="form" />} />
-            </Popconfirm>
+            {checkPermission('menu-action/update') && (
+              <>
+                <Button
+                  type="link"
+                  icon={<EditOutlined type="form" />}
+                  onClick={() => showModal('Update', { appCode, menuCode })}
+                />
+              </>
+            )}
+
+            {checkPermission('menu-action/update') && (
+              <>
+                <Popconfirm
+                  title={`Bạn có muốn xóa (${menuCode} - ${name}) này không? `}
+                  onConfirm={() => deleteItem(appCode, menuCode)}
+                  okText="Đồng ý"
+                  cancelText="Không"
+                >
+                  <Button type="link" danger icon={<DeleteOutlined type="form" />} />
+                </Popconfirm>
+              </>
+            )}
           </Space>
         </>
       ),

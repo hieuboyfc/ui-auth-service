@@ -14,6 +14,7 @@ export interface AuthState {
   username?: string;
   currentUser?: User;
   currentMenuAction?: Menu;
+  currentMenuActionAll?: Menu;
   message: string;
 }
 
@@ -23,6 +24,7 @@ const initialState: AuthState = {
   username: '',
   currentUser: undefined,
   currentMenuAction: undefined,
+  currentMenuActionAll: undefined,
   message: '',
 };
 
@@ -58,6 +60,15 @@ const authSlice = createSlice({
       state.currentMenuAction = undefined;
       state.message = action.payload;
     },
+    getAllMenuAccessSuccess(state: any, action: PayloadAction<Menu>) {
+      state.isLoggedIn = true;
+      state.currentMenuActionAll = action.payload;
+    },
+    getAllMenuAccessFailed(state: any, action: PayloadAction<string>) {
+      state.isLoggedIn = false;
+      state.currentMenuActionAll = undefined;
+      state.message = action.payload;
+    },
   },
 });
 
@@ -68,6 +79,7 @@ export const authActions = authSlice.actions;
 export const selectIsLoggedIn = (state: any) => state.auth.isLoggedIn;
 export const selectIsLogging = (state: any) => state.auth.logging;
 export const selectCurrentMenuAction = (state: RootState) => state.auth.currentMenuAction;
+export const selectCurrentMenuActionAll = (state: RootState) => state.auth.currentMenuActionAll;
 
 // Reducer
 export const authReducer = authSlice.reducer;

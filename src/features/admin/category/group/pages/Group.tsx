@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { Button, Card, Form, Popconfirm, Result, Space, Spin, Tag } from 'antd';
+import { Button, Card, Form, Menu, Popconfirm, Result, Space, Spin, Tag } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import Tree, { DataNode } from 'antd/lib/tree';
 import StyledModal from 'components/UI/StyledModal/StyledModal';
@@ -48,6 +48,7 @@ export function Group() {
   };
   const dispatch = useAppDispatch();
   const { loading, groups } = useAppSelector((state) => state.group);
+  const { currentMenuActionAll } = useAppSelector((state) => state.auth);
   const [form] = Form.useForm();
   const [formSearch] = Form.useForm();
   const [formLayout, setFormLayout] = useState<LayoutType>('inline');
@@ -61,12 +62,32 @@ export function Group() {
   const [typeSubmit, setTypeSubmit] = useState<string>('AddNew');
   const [spin, setSpin] = useState<boolean>(false);
   const [permission, setPermission] = useState<boolean>(true);
+  const [dataPermission, setDataPermission] = useState<any>();
 
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [autoExpandParent, setAutoExpandParent] = useState<boolean>(true);
   const [treeData, setTreeData] = useState<DataNode[]>([]);
+
+  useEffect(() => {
+    if (currentMenuActionAll !== undefined) {
+      setDataPermission(currentMenuActionAll);
+    }
+  }, [currentMenuActionAll]);
+
+  function checkPermission(menuCode: string) {
+    let check = false;
+    if (dataPermission !== undefined) {
+      check = dataPermission.filter((item: string) => {
+        if (item === menuCode) {
+          return true;
+        }
+        return false;
+      });
+    }
+    return check;
+  }
 
   function fetchDataGroup(params: GroupParams) {
     dispatch(fetchGroup(params))
@@ -365,24 +386,38 @@ export function Group() {
       render: ({ appCode, groupCode, name }) => (
         <>
           <Space wrap>
-            <Button
-              type="link"
-              icon={<EditOutlined type="form" />}
-              onClick={() => showModal('Update', { appCode, groupCode })}
-            />
-            <Popconfirm
-              title={`Bạn có muốn xóa (${groupCode} - ${name}) này không? `}
-              onConfirm={() => deleteItem(appCode, groupCode)}
-              okText="Đồng ý"
-              cancelText="Không"
-            >
-              <Button type="link" danger icon={<DeleteOutlined type="form" />} />
-            </Popconfirm>
-            <Button
-              type="link"
-              icon={<MenuUnfoldOutlined type="form" />}
-              onClick={() => showModalMenuAction({ appCode, groupCode, name })}
-            />
+            {checkPermission('group/update') && (
+              <>
+                <Button
+                  type="link"
+                  icon={<EditOutlined type="form" />}
+                  onClick={() => showModal('Update', { appCode, groupCode })}
+                />
+              </>
+            )}
+
+            {checkPermission('group/delete') && (
+              <>
+                <Popconfirm
+                  title={`Bạn có muốn xóa (${groupCode} - ${name}) này không? `}
+                  onConfirm={() => deleteItem(appCode, groupCode)}
+                  okText="Đồng ý"
+                  cancelText="Không"
+                >
+                  <Button type="link" danger icon={<DeleteOutlined type="form" />} />
+                </Popconfirm>
+              </>
+            )}
+
+            {checkPermission('menu-action-all-by-group') && (
+              <>
+                <Button
+                  type="link"
+                  icon={<MenuUnfoldOutlined type="form" />}
+                  onClick={() => showModalMenuAction({ appCode, groupCode, name })}
+                />
+              </>
+            )}
           </Space>
         </>
       ),

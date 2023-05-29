@@ -1,6 +1,5 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
-import authApi from 'api/authApi';
-import menuActionApi from 'api/menuActionApi';
+import authApi from 'features/admin/auth/authApi';
 import { push } from 'connected-react-router';
 import Cookies from 'js-cookie';
 import JwtDecode from 'jwt-decode';
@@ -9,6 +8,7 @@ import { Token } from 'models/token';
 import { call, delay, fork, put, take } from 'redux-saga/effects';
 import { LoginPayload } from './authModel';
 import { authActions } from './authSlice';
+import menuActionApi from '../category/menuAction/menuActionApi';
 
 function* handleLogin(payload: LoginPayload) {
   try {
@@ -58,6 +58,20 @@ function* fetchMenuByCurrentUser() {
   }
 }
 
+function* fetchMenuAllByCurrentUser() {
+  try {
+    const response = yield call(menuActionApi.getMenuActionAllByCurrentUser);
+    if (response !== null) {
+      const menu: Menu = response;
+      yield put(authActions.getAllMenuAccessSuccess(menu));
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      yield put(authActions.getAllMenuAccessFailed(error.message));
+    }
+  }
+}
+
 function* watchLoginFlow() {
   while (true) {
     const isLoggedIn = Boolean(Cookies.get('accessToken'));
@@ -75,5 +89,6 @@ export default function* authSaga() {
   const isLoggedIn = Boolean(Cookies.get('accessToken'));
   if (isLoggedIn) {
     yield fork(fetchMenuByCurrentUser);
+    yield fork(fetchMenuAllByCurrentUser);
   }
 }

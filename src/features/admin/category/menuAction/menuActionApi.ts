@@ -10,6 +10,14 @@ import {
 } from './menuActionModel';
 
 const menuActionApi = {
+  getMenuActionByCurrentUser() {
+    const url = URL_API.concat('/v1/menu-action/menu-action-by-current-user');
+    return axiosClient.get(url);
+  },
+  getMenuActionAllByCurrentUser() {
+    const url = URL_API.concat('/v1/menu-action/menu-action-all-by-current-user');
+    return axiosClient.get(url);
+  },
   fetchMenuAction(params: MenuActionParams): Promise<ListResponse<MenuActionModel>> {
     const url = URL_API.concat('/v1/menu-action/search');
     return axiosClient.get(url, { params });
