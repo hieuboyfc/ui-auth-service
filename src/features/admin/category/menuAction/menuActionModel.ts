@@ -10,6 +10,7 @@ export interface MenuActionModel {
   orderNo?: number;
   type?: number;
   status?: number;
+  children?: MenuActionModel[];
 }
 
 export interface MenuActionTree {

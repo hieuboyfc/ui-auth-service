@@ -34,7 +34,7 @@ export default function StyledTable(props: StyledTableProps) {
           showTitle: true,
           showTotal: (total) => `Tổng số ${total} bản ghi`,
         }}
-        scroll={{ x: 0, y: 295 }}
+        scroll={{ x: 1200, y: 295 }}
         rowKey="id"
         locale={{ emptyText: 'Không tìm thấy dữ liệu.' }}
         title={() => `Tổng số bản ghi: ${result.response.totalElements}`}

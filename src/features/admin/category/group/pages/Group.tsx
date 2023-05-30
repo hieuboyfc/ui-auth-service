@@ -331,6 +331,7 @@ export function Group() {
       },
       sortDirections: ['descend', 'ascend'],
       ellipsis: true,
+      fixed: 'left',
     },
     {
       title: 'Mã nhóm',
@@ -357,7 +358,7 @@ export function Group() {
     {
       title: 'Trạng thái',
       key: 'status',
-      width: 180,
+      width: '15%',
       render: ({ status }) => (
         <>
           <div style={{ textAlign: 'center' }}>
@@ -367,7 +368,7 @@ export function Group() {
                   Đang hoạt động
                 </Tag>
               )}
-              {status === 2 && (
+              {status === 0 && (
                 <Tag color="error" key={status}>
                   Ngừng hoạt động
                 </Tag>
@@ -380,9 +381,9 @@ export function Group() {
     {
       title: 'Chức năng',
       key: 'operation',
-      fixed: 'right',
-      width: 180,
+      width: '15%',
       align: 'center',
+      fixed: 'right',
       render: ({ appCode, groupCode, name }) => (
         <>
           <Space wrap>
