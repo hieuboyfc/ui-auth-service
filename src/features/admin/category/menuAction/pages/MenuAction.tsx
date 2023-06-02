@@ -1,15 +1,14 @@
-import { EditOutlined, MinusCircleTwoTone, PlusCircleTwoTone } from '@ant-design/icons';
-import { Button, Card, Form, Result, Space, Tag } from 'antd';
+import { DeleteOutlined, EditOutlined, PlusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Form, Popconfirm, Result, Row, Space, Tag } from 'antd';
 import Table, { ColumnsType } from 'antd/lib/table';
 import { TableRowSelection } from 'antd/lib/table/interface';
+import StyledButton from 'components/UI/StyledButton/StyledButton';
 import StyledModal from 'components/UI/StyledModal/StyledModal';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { SIZE_OF_PAGE } from 'utils';
 import { notifyError, notifySuccess } from 'utils/notification';
 import { FormMenuActionSave } from '../components/FormMenuActionSave';
-import { FormMenuActionSearch } from '../components/FormMenuActionSearch';
 import { MenuActionById, MenuActionModel, MenuActionParams } from '../menuActionModel';
 import {
   deleteMenuAction,
@@ -22,53 +21,7 @@ import './style.css';
 
 export interface MenuActionProps {}
 
-const dataTable: MenuActionModel[] = [
-  {
-    key: 1,
-    name: 'Chạy ngay đi 1',
-    menuCode: 'abc',
-    parentCode: 'abc',
-    appCode: 'abc',
-    url: 'xxx',
-    type: 1,
-    orderNo: 1,
-    status: 1,
-    description: 'New York No. 1 Lake Park',
-    children: [
-      {
-        key: 11,
-        name: 'Chạy ngay đi',
-        menuCode: 'abc',
-        parentCode: 'abc',
-        appCode: 'abc',
-        url: 'xxx',
-        type: 1,
-        orderNo: 1,
-        status: 1,
-        description: 'New York No. 1 Lake Park',
-      },
-    ],
-  },
-  {
-    key: 2,
-    name: 'Chạy ngay đi',
-    menuCode: 'abc',
-    parentCode: 'abc',
-    appCode: 'abc',
-    url: 'xxx',
-    type: 1,
-    orderNo: 1,
-    status: 1,
-    description: 'New York No. 1 Lake Park',
-  },
-];
-
 const defaultParams: MenuActionParams = {
-  page: 0,
-  size: SIZE_OF_PAGE,
-  sort: 'DESC',
-  menuCode: null,
-  name: null,
   status: 1,
 };
 
@@ -81,8 +34,6 @@ export function MenuAction() {
   const { loading, menuActions } = useAppSelector((state) => state.menuAction);
   const { currentMenuActionAll } = useAppSelector((state) => state.auth);
   const [form] = Form.useForm();
-  const [formSearch] = Form.useForm();
-  const [requestParams, setRequestParams] = useState<MenuActionParams>(defaultParams);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
   const [modalTitle, setModalTitle] = useState<string>('Thêm mới Chức năng');
@@ -101,12 +52,15 @@ export function MenuAction() {
   function checkPermission(menuCode: string) {
     let check = false;
     if (dataPermission !== undefined) {
-      check = dataPermission.filter((item: string) => {
-        if (item === menuCode) {
-          return true;
+      const result: string[] = [];
+      dataPermission.forEach((item: any) => {
+        if (item.menuCode === menuCode) {
+          result.push(menuCode);
         }
-        return false;
       });
+      if (result.includes(menuCode)) {
+        check = true;
+      }
     }
     return check;
   }
@@ -125,23 +79,8 @@ export function MenuAction() {
   }
 
   useEffect(() => {
-    fetchDataMenuAction(requestParams);
+    fetchDataMenuAction(defaultParams);
   }, []);
-
-  const onSearch = () => {
-    const values = formSearch.getFieldsValue();
-    const params: MenuActionParams = {
-      ...requestParams,
-      menuCode: values.menuCode ? values.menuCode : null,
-      name: values.name ? values.name : null,
-    };
-    fetchDataMenuAction(params);
-    setRequestParams(params);
-  };
-
-  const onSearchFailed = () => {
-    notifyError('Có lỗi xảy ra trong quá trình thao tác');
-  };
 
   const onSubmit = async () => {
     const values = form.getFieldsValue();
@@ -160,7 +99,7 @@ export function MenuAction() {
         setTimeout(() => {
           setOpenModal(false);
           setConfirmLoading(false);
-          dispatch(fetchMenuAction(requestParams));
+          dispatch(fetchMenuAction(defaultParams));
           form.resetFields();
           notifySuccess('Thêm mới dữ liệu thành công');
         }, 2000);
@@ -178,7 +117,7 @@ export function MenuAction() {
         setTimeout(() => {
           setOpenModal(false);
           setConfirmLoading(false);
-          dispatch(fetchMenuAction(requestParams));
+          dispatch(fetchMenuAction(defaultParams));
           form.resetFields();
           notifySuccess('Cập nhật dữ liệu thành công');
         }, 2000);
@@ -243,7 +182,7 @@ export function MenuAction() {
       };
       const response = await dispatch(deleteMenuAction(params));
       if (response.meta.requestStatus !== 'rejected') {
-        dispatch(fetchMenuAction(requestParams));
+        dispatch(fetchMenuAction(defaultParams));
         notifySuccess('Xóa dữ liệu dữ liệu thành công');
       } else {
         notifyError(response.payload);
@@ -307,17 +246,46 @@ export function MenuAction() {
     },
     {
       title: 'Loại chức năng',
-      dataIndex: 'type',
       key: 'type',
       ellipsis: true,
       width: '10%',
+      render: ({ type }) => (
+        <>
+          <div style={{ textAlign: 'center' }}>
+            <Space direction="vertical">
+              {type === 1 && (
+                <Tag color="purple" key={type}>
+                  Frontend
+                </Tag>
+              )}
+              {type === 2 && (
+                <Tag color="green" key={type}>
+                  Backend
+                </Tag>
+              )}
+            </Space>
+          </div>
+        </>
+      ),
     },
     {
       title: 'Thứ tự',
-      dataIndex: 'orderNo',
-      key: 'orderNo',
+      key: 'orderNum',
       ellipsis: true,
       width: '10%',
+      render: ({ orderNum }) => (
+        <>
+          <div style={{ textAlign: 'center' }}>
+            {orderNum !== undefined && (
+              <Space direction="vertical">
+                <Tag color="cyan" key={orderNum}>
+                  {orderNum}
+                </Tag>
+              </Space>
+            )}
+          </div>
+        </>
+      ),
     },
     {
       title: 'Mô tả',
@@ -328,7 +296,6 @@ export function MenuAction() {
     },
     {
       title: 'Trạng thái',
-      dataIndex: 'status',
       key: 'status',
       ellipsis: true,
       width: '12%',
@@ -357,17 +324,38 @@ export function MenuAction() {
       align: 'center',
       ellipsis: true,
       fixed: 'right',
-      width: '8%',
-      render: ({ appCode, groupCode, name }) => (
+      width: '10%',
+      render: ({ appCode, menuCode, type, name }) => (
         <>
           <Space wrap>
-            {checkPermission('group/update') && (
+            {checkPermission('menu-action/create') && type === 1 && (
+              <>
+                <Button
+                  type="link"
+                  icon={<PlusCircleOutlined type="form" />}
+                  //onClick={() => showModal('Update', { appCode, groupCode })}
+                />
+              </>
+            )}
+            {checkPermission('menu-action/update') && (
               <>
                 <Button
                   type="link"
                   icon={<EditOutlined type="form" />}
-                  //onClick={() => showModal('Update', { appCode, groupCode })}
+                  onClick={() => showModal('Update', { appCode, menuCode })}
                 />
+              </>
+            )}
+            {checkPermission('menu-action/delete') && type === 2 && (
+              <>
+                <Popconfirm
+                  title={`Bạn có muốn xóa (${menuCode} - ${name}) này không? `}
+                  onConfirm={() => deleteItem(appCode, menuCode)}
+                  okText="Đồng ý"
+                  cancelText="Không"
+                >
+                  <Button type="link" danger icon={<DeleteOutlined type="form" />} />
+                </Popconfirm>
               </>
             )}
           </Space>
@@ -407,35 +395,34 @@ export function MenuAction() {
       )}
       {permission && (
         <>
-          {menuActions && menuActions.result && (
+          {menuActions && menuActions?.children && (
             <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-              <Card title="Tìm kiếm dữ liệu" size="small">
-                <FormMenuActionSearch
-                  loading={loading}
-                  form={formSearch}
-                  onSearch={onSearch}
-                  onFinishFailed={onSearchFailed}
-                  showModal={() => showModal('AddNew')}
-                />
+              <Card title="Thao tác chức năng" size="small">
+                <Row gutter={16} style={{ justifyContent: 'flex-end' }}>
+                  <Col style={{ width: '160px' }}>
+                    <StyledButton
+                      type="primary"
+                      onClick={() => showModal('AddNew')}
+                      size="middle"
+                      icon={<PlusOutlined />}
+                      title="Thêm mới"
+                    />
+                  </Col>
+                </Row>
               </Card>
-              <Card title="Danh sách chức năng" size="small">
-                {/* <div className="total-elements">{`Tổng số bản ghi: ${menuActions.totalElements}`}</div> */}
-                {/* <StyledTable
-                  loading={loading}
-                  rowSelection={rowSelection}
-                  columns={columns}
-                  response={menuActions}
-                  onPageChange={onPageChange}
-                  onSizeChange={onSizeChange}
-                /> */}
+              <Card title="Danh sách dữ liệu chức năng" size="small">
+                <div className="total-elements">{`Tổng số bản ghi: ${
+                  menuActions?.totalRecord || 0
+                }`}</div>
                 <Table
                   size="small"
                   indentSize={0}
                   columns={columns}
                   rowSelection={{ ...rowSelection }}
-                  dataSource={dataTable}
+                  dataSource={menuActions?.children || []}
                   scroll={{ x: 2000 }}
                   pagination={false}
+                  defaultExpandAllRows
                   bordered
                 />
               </Card>

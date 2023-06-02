@@ -1,6 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ListResponse } from 'models/common';
-import { SIZE_OF_PAGE } from 'utils';
 import { MenuActionModel, MenuActionTree } from './menuActionModel';
 import {
   deleteMenuAction,
@@ -16,7 +14,7 @@ export interface MenuActionState {
   error?: any;
   data?: MenuActionModel[];
   dataTree?: MenuActionTree[];
-  menuActions?: ListResponse<MenuActionModel>;
+  menuActions?: MenuActionModel;
 }
 
 const initialState: MenuActionState = {
@@ -24,14 +22,7 @@ const initialState: MenuActionState = {
   error: {},
   data: undefined,
   dataTree: undefined,
-  menuActions: {
-    result: [],
-    last: false,
-    page: 0,
-    size: SIZE_OF_PAGE,
-    totalElements: 0,
-    totalPages: 0,
-  },
+  menuActions: undefined,
 };
 
 const menuActionSlice = createSlice({
@@ -43,14 +34,11 @@ const menuActionSlice = createSlice({
       .addCase(fetchMenuAction.pending, (state: any) => {
         state.loading = true;
       })
-      .addCase(
-        fetchMenuAction.fulfilled,
-        (state: any, action: PayloadAction<ListResponse<MenuActionModel>>) => {
-          state.loading = false;
-          state.groups = action.payload;
-          state.error.fetchMenuAction = '';
-        },
-      )
+      .addCase(fetchMenuAction.fulfilled, (state: any, action: PayloadAction<MenuActionModel[]>) => {
+        state.loading = false;
+        state.menuActions = action.payload;
+        state.error.fetchMenuAction = '';
+      })
       .addCase(fetchMenuAction.rejected, (state: any, action: PayloadAction<any>) => {
         state.loading = false;
         state.error.fetchMenuAction = action.payload;

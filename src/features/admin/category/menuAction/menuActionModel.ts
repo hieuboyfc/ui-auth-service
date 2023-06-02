@@ -8,9 +8,11 @@ export interface MenuActionModel {
   parentCode?: string;
   description?: string;
   orderNo?: number;
+  orderNum?: string;
   type?: number;
   status?: number;
   children?: MenuActionModel[];
+  totalRecord?: number;
 }
 
 export interface MenuActionTree {
@@ -25,10 +27,5 @@ export interface MenuActionById {
 }
 
 export interface MenuActionParams {
-  page: number;
-  size: number;
-  sort: string;
-  menuCode?: string | null;
-  name?: string | null;
   status?: number;
 }

@@ -79,12 +79,15 @@ export function Group() {
   function checkPermission(menuCode: string) {
     let check = false;
     if (dataPermission !== undefined) {
-      check = dataPermission.filter((item: string) => {
-        if (item === menuCode) {
-          return true;
+      const result: string[] = [];
+      dataPermission.forEach((item: any) => {
+        if (item.menuCode === menuCode) {
+          result.push(menuCode);
         }
-        return false;
       });
+      if (result.includes(menuCode)) {
+        check = true;
+      }
     }
     return check;
   }
@@ -515,7 +518,7 @@ export function Group() {
                   showModal={() => showModal('AddNew')}
                 />
               </Card>
-              <Card title="Danh sách nhóm người dùng" size="small">
+              <Card title="Danh sách dữ liệu nhóm người dùng" size="small">
                 {/* <div className="total-elements">{`Tổng số bản ghi: ${groups.totalElements}`}</div> */}
                 <StyledTable
                   loading={loading}

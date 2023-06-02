@@ -1,4 +1,3 @@
-import { ListResponse } from 'models/common';
 import { URL_API } from 'utils';
 import axiosClient from 'utils/axiosClient';
 import { GroupById } from '../group/groupModel';
@@ -18,8 +17,8 @@ const menuActionApi = {
     const url = URL_API.concat('/v1/menu-action/menu-action-all-by-current-user');
     return axiosClient.get(url);
   },
-  fetchMenuAction(params: MenuActionParams): Promise<ListResponse<MenuActionModel>> {
-    const url = URL_API.concat('/v1/menu-action/search');
+  fetchMenuAction(params: MenuActionParams): Promise<MenuActionModel[]> {
+    const url = URL_API.concat('/v1/menu-action/load-data');
     return axiosClient.get(url, { params });
   },
   insertMenuAction(payload: MenuActionModel): Promise<MenuActionModel> {
