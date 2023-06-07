@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined, PlusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Card, Col, Form, Popconfirm, Result, Row, Space, Tag } from 'antd';
+import { Button, Card, Col, Form, Popconfirm, Result, Row, Space, Tag, Typography } from 'antd';
 import Table, { ColumnsType } from 'antd/lib/table';
 import { TableRowSelection } from 'antd/lib/table/interface';
 import StyledButton from 'components/UI/StyledButton/StyledButton';
@@ -14,6 +14,7 @@ import {
   deleteMenuAction,
   fetchMenuAction,
   getMenuAction,
+  getMenuActionAllByParent,
   insertMenuAction,
   updateMenuAction,
 } from '../menuActionService';
@@ -23,6 +24,7 @@ export interface MenuActionProps {}
 
 const defaultParams: MenuActionParams = {
   status: 1,
+  appCode: '',
 };
 
 export function MenuAction() {
@@ -39,9 +41,11 @@ export function MenuAction() {
   const [modalTitle, setModalTitle] = useState<string>('Thêm mới Chức năng');
   const [modalButtonTitle, setModalButtonTitle] = useState<string>('Lưu');
   const [typeSubmit, setTypeSubmit] = useState<string>('AddNew');
+  const [isUpdate, setIsUpdate] = useState<boolean>(false);
   const [spin, setSpin] = useState<boolean>(false);
   const [permission, setPermission] = useState<boolean>(true);
   const [dataPermission, setDataPermission] = useState<any>();
+  const [defaultAppCode, setDefaultAppCode] = useState<string>('Auth-Service');
 
   useEffect(() => {
     if (currentMenuActionAll !== undefined) {
@@ -78,8 +82,23 @@ export function MenuAction() {
       });
   }
 
+  function fetchMenuActionAllByParent(params: MenuActionById) {
+    params.appCode = defaultAppCode;
+    dispatch(getMenuActionAllByParent(params))
+      .then((result) => {
+        const data: any = { ...result };
+        if (data.meta.requestStatus === 'rejected') {
+          notifyError(data.payload.message);
+        }
+      })
+      .catch((e) => {
+        notifyError(e);
+      });
+  }
+
   useEffect(() => {
     fetchDataMenuAction(defaultParams);
+    fetchMenuActionAllByParent(defaultParams);
   }, []);
 
   const onSubmit = async () => {
@@ -145,9 +164,11 @@ export function MenuAction() {
       setModalTitle('Thêm mới chức năng');
       setModalButtonTitle('Lưu');
       setOpenModal(true);
+      setIsUpdate(false);
     }
     if (type === 'Update') {
       if (values?.appCode !== undefined && values?.menuCode !== undefined) {
+        setIsUpdate(true);
         setSpin(true);
         const params = {
           appCode: values.appCode,
@@ -156,10 +177,31 @@ export function MenuAction() {
         const response = await dispatch(getMenuAction(params));
         if (response.meta.requestStatus === 'fulfilled') {
           const dataResponse: any = response.payload;
-          const { status, ...newData } = dataResponse;
+          const { status, url, ...newData } = dataResponse;
+          let method = '';
+          let linkUrl = url;
+          if (url !== '') {
+            if (url.indexOf('[GET]') === 0) {
+              method = '[GET]';
+            }
+            if (url.indexOf('[POST]') === 0) {
+              method = '[POST]';
+            }
+            if (url.indexOf('[PUT]') === 0) {
+              method = '[PUT]';
+            }
+            if (url.indexOf('[DELETE]') === 0) {
+              method = '[DELETE]';
+            }
+            if (method !== '') {
+              linkUrl = url.substring(method.length, url.length);
+            }
+          }
           const result = {
             ...newData,
             id: newData.id,
+            method: method || '',
+            url: linkUrl || '',
             status: status ? String(status) : '0',
           };
           form.setFieldsValue(result);
@@ -209,25 +251,34 @@ export function MenuAction() {
   const columns: ColumnsType<MenuActionModel> = [
     {
       title: 'Tên chức năng',
-      dataIndex: 'name',
       key: 'name',
       fixed: 'left',
       ellipsis: true,
-      width: '14%',
+      width: '18%',
+      render: ({ name, children }) => (
+        <>
+          {children?.length > 0 && (
+            <Typography.Title level={5} style={{ margin: 0, fontSize: 15 }}>
+              {name}
+            </Typography.Title>
+          )}
+          {children === undefined && <>{name}</>}
+        </>
+      ),
     },
     {
       title: 'Mã chức năng',
       dataIndex: 'menuCode',
       key: 'menuCode',
       fixed: 'left',
-      ellipsis: true,
+      ellipsis: false,
       width: '10%',
     },
     {
       title: 'Mã chức năng cha',
       dataIndex: 'parentCode',
       key: 'parentCode',
-      ellipsis: true,
+      ellipsis: false,
       width: '10%',
     },
     {
@@ -241,14 +292,14 @@ export function MenuAction() {
       title: 'Đường dẫn Url',
       dataIndex: 'url',
       key: 'url',
-      ellipsis: true,
+      ellipsis: false,
       width: '20%',
     },
     {
       title: 'Loại chức năng',
       key: 'type',
       ellipsis: true,
-      width: '10%',
+      width: '11%',
       render: ({ type }) => (
         <>
           <div style={{ textAlign: 'center' }}>
@@ -260,7 +311,12 @@ export function MenuAction() {
               )}
               {type === 2 && (
                 <Tag color="green" key={type}>
-                  Backend
+                  Backend Private
+                </Tag>
+              )}
+              {type === 3 && (
+                <Tag color="orange" key={type}>
+                  Backend Public
                 </Tag>
               )}
             </Space>
@@ -272,7 +328,7 @@ export function MenuAction() {
       title: 'Thứ tự',
       key: 'orderNum',
       ellipsis: true,
-      width: '10%',
+      width: '8%',
       render: ({ orderNum }) => (
         <>
           <div style={{ textAlign: 'center' }}>
@@ -298,7 +354,7 @@ export function MenuAction() {
       title: 'Trạng thái',
       key: 'status',
       ellipsis: true,
-      width: '12%',
+      width: '11%',
       render: ({ status }) => (
         <>
           <div style={{ textAlign: 'center' }}>
@@ -346,7 +402,7 @@ export function MenuAction() {
                 />
               </>
             )}
-            {checkPermission('menu-action/delete') && type === 2 && (
+            {checkPermission('menu-action/delete') && type !== 1 && type > 0 && (
               <>
                 <Popconfirm
                   title={`Bạn có muốn xóa (${menuCode} - ${name}) này không? `}
@@ -437,6 +493,7 @@ export function MenuAction() {
             onCancel={handleCancel}
             content={
               <FormMenuActionSave
+                isUpdate={isUpdate}
                 spin={spin}
                 form={form}
                 onFinish={onSubmit}
@@ -446,7 +503,7 @@ export function MenuAction() {
             buttonTitle={modalButtonTitle}
             form="menuAction"
             htmlType="submit"
-            width="600px"
+            width="1000px"
           />
         </>
       )}

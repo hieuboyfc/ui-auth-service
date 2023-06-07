@@ -41,6 +41,10 @@ const menuActionApi = {
     const url = URL_API.concat('/v1/menu-action/menu-action-all-by-group');
     return axiosClient.get(url, { params });
   },
+  getMenuActionAllByParent(params: MenuActionById): Promise<MenuActionTree> {
+    const url = URL_API.concat('/v1/menu-action/menu-action-all-by-parent');
+    return axiosClient.get(url, { params });
+  },
 };
 
 export default menuActionApi;

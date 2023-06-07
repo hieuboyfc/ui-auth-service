@@ -18,6 +18,7 @@ export interface MenuActionModel {
 export interface MenuActionTree {
   children?: MenuActionTree[] | undefined;
   key?: string;
+  value?: string;
   title?: string;
 }
 
@@ -28,4 +29,5 @@ export interface MenuActionById {
 
 export interface MenuActionParams {
   status?: number;
+  appCode?: string;
 }

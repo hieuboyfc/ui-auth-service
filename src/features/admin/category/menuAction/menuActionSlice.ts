@@ -5,6 +5,7 @@ import {
   fetchMenuAction,
   getMenuAction,
   getMenuActionAllByGroup,
+  getMenuActionAllByParent,
   insertMenuAction,
   updateMenuAction,
 } from './menuActionService';
@@ -14,6 +15,7 @@ export interface MenuActionState {
   error?: any;
   data?: MenuActionModel[];
   dataTree?: MenuActionTree[];
+  menuActionByParent?: MenuActionTree[];
   menuActions?: MenuActionModel;
 }
 
@@ -22,6 +24,7 @@ const initialState: MenuActionState = {
   error: {},
   data: undefined,
   dataTree: undefined,
+  menuActionByParent: undefined,
   menuActions: undefined,
 };
 
@@ -34,11 +37,14 @@ const menuActionSlice = createSlice({
       .addCase(fetchMenuAction.pending, (state: any) => {
         state.loading = true;
       })
-      .addCase(fetchMenuAction.fulfilled, (state: any, action: PayloadAction<MenuActionModel[]>) => {
-        state.loading = false;
-        state.menuActions = action.payload;
-        state.error.fetchMenuAction = '';
-      })
+      .addCase(
+        fetchMenuAction.fulfilled,
+        (state: any, action: PayloadAction<MenuActionModel[]>) => {
+          state.loading = false;
+          state.menuActions = action.payload;
+          state.error.fetchMenuAction = '';
+        },
+      )
       .addCase(fetchMenuAction.rejected, (state: any, action: PayloadAction<any>) => {
         state.loading = false;
         state.error.fetchMenuAction = action.payload;
@@ -114,6 +120,22 @@ const menuActionSlice = createSlice({
       .addCase(getMenuActionAllByGroup.rejected, (state: any, action: PayloadAction<any>) => {
         state.loading = false;
         state.error.getMenuActionAllByGroup = action.payload;
+      });
+    builder
+      .addCase(getMenuActionAllByParent.pending, (state: any) => {
+        state.loading = false;
+      })
+      .addCase(
+        getMenuActionAllByParent.fulfilled,
+        (state: any, action: PayloadAction<MenuActionTree>) => {
+          state.loading = false;
+          state.menuActionByParent = action.payload.children;
+          state.error.getMenuActionAllByParent = '';
+        },
+      )
+      .addCase(getMenuActionAllByParent.rejected, (state: any, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error.getMenuActionAllByParent = action.payload;
       });
   },
 });

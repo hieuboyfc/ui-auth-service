@@ -49,7 +49,7 @@ export function FormGroupSave(props: FormGroupSaveProps) {
               <Form.Item
                 name="appCode"
                 label="Mã ứng dụng"
-                rules={[{ required: true, message: 'Vui lòng chọn mã ứng dụng!' }]}
+                rules={[{ required: true, message: 'Vui lòng chọn Mã ứng dụng!' }]}
               >
                 <Select placeholder="Chọn ứng dụng" options={selectAppCode} />
               </Form.Item>
@@ -58,7 +58,7 @@ export function FormGroupSave(props: FormGroupSaveProps) {
               <Form.Item
                 name="groupCode"
                 label="Mã nhóm"
-                rules={[{ required: true, message: 'Vui lòng nhập mã nhóm!' }]}
+                rules={[{ required: true, message: 'Vui lòng nhập Mã nhóm!' }]}
               >
                 <Input />
               </Form.Item>
@@ -67,7 +67,7 @@ export function FormGroupSave(props: FormGroupSaveProps) {
               <Form.Item
                 name="name"
                 label="Tên nhóm"
-                rules={[{ required: true, message: 'Vui lòng nhập tên nhóm!' }]}
+                rules={[{ required: true, message: 'Vui lòng nhập Tên nhóm!' }]}
               >
                 <Input />
               </Form.Item>
@@ -76,7 +76,7 @@ export function FormGroupSave(props: FormGroupSaveProps) {
               <Form.Item
                 name="status"
                 label="Trạng thái"
-                rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
+                rules={[{ required: true, message: 'Vui lòng chọn Trạng thái!' }]}
               >
                 <Select placeholder="Chọn trạng thái" options={selectStatus} />
               </Form.Item>

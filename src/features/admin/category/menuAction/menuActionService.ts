@@ -142,3 +142,15 @@ export const getMenuActionAllByGroup = createAsyncThunk(
     }
   },
 );
+
+export const getMenuActionAllByParent = createAsyncThunk(
+  'menuAction/getMenuActionAllByParent',
+  async (params: MenuActionById, thunkAPI) => {
+    try {
+      const response = await menuActionApi.getMenuActionAllByParent(params);
+      return response;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  },
+);
